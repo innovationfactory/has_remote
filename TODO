@@ -29,3 +29,9 @@
 	   <name>George Remote</name>
 	 </remote>
  </user>
+
+ - Make models set up a separate remote for such 'remote remote attributes' that connects to the originating server.
+
+ class User < ActiveRecord::Base
+   has_remote :site => '...', :shallow => true # Creates new remotes for attributes that originally came from other hosts.
+ end
