@@ -1,0 +1,31 @@
+= Todos and ideas
+
+ - Provide an easy way of caching certain fields locally, in order to enable joining, sorting, etc... has_remote should keep it in sync automatically.
+
+ class User < ActiveRecord::Base
+   has_remote :site => '...' do |remote|
+		 remote.attribute :email
+	   remote.cached_attribute :name # assumes there also is a local column called 'name'.
+	 end
+ end
+
+ - Create method <tt>remote_attributes</tt>.
+ - Creating, updating and destroying resources both locally and remote transparently.
+ - Allow for multiple remotes, so that composing one object from different resources becomes a possibility.
+ - Make <tt>to_xml</tt> and <tt>to_json</tt> etc. optionally merge in remote attributes (<tt>to_xml(:remotes => :merge)</tt>).
+
+ <user>
+   <id type="integer">1</id>
+   <remote_id type="integer">1</remote_id>
+   <name>George Remote</name>
+ </user>
+
+ - Make <tt>to_xml</tt> etc. optionally include remotes, so consumers may talk to origins directly (<tt>to_xml(:remotes => :include)</tt>).
+
+ <user>
+   <id type="integer">1</id>
+   <remote site="...">
+	   <id type="integer">1</id>
+	   <name>George Remote</name>
+	 </remote>
+ </user>
