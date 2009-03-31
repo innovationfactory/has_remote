@@ -97,7 +97,7 @@ module HasRemote #:nodoc:
     def attribute(attr_name)
       @base.class_eval <<-RB
         def #{attr_name}
-          remote.send :#{attr_name}
+          remote.nil? ? nil : remote.send(:#{attr_name})
         end
         def #{attr_name}=(arg)
           raise NoMethodError.new("#{attr_name} is a remote attribute and therefor can't be set.")

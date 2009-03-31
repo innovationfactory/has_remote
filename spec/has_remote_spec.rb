@@ -13,6 +13,7 @@ describe HasRemoteSpec::User do
      User.remote_class.element_name.should == "user"
   end
   
+
   describe "instances" do
     
     before(:each) do
@@ -50,6 +51,17 @@ describe HasRemoteSpec::User do
       User::Remote.should_receive(:find).any_number_of_times.with(1).and_raise "not found"
       @user.remote.should be_nil
       @user.has_remote?.should be_false
+    end
+    
+    context "without a remote" do
+      before(:each) do
+        @user.remote_id = nil
+      end
+      
+      it "should return nil for remote attributes" do
+        @user.remote.should be_nil
+        @user.name.should be_nil
+      end
     end
   end
   
