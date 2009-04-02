@@ -56,6 +56,56 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
+=== Local cache
+
+In case you need to do database operations on remote attributes, like sorting, you can tell has_remote
+to locally cache specific attributes in the following manner:
+
+ class User < ActiveRecord::Base
+	 has_remote :site => '...' do |remote|
+	   remote.attribute :username, :local_cache => true
+	 end
+ end
+
+This assumes you have a 'username' column in the 'users' table.
+
+has_remote provides three ways of keeping you locally cached attributes in sync with their remote values.
+
+ 1. Manual sync
+ 2. Auto-sync
+ 3. Rake task has_remote:sync
+
+==== Manual sync
+See HasRemote::Cache for more information on the available methods for triggering synchronization manually.
+
+==== Auto-sync
+
+ class User < ActiveRecord::Base
+	 has_remote :site => '...' do |remote|
+	   remote.attribute :username, :local_cache => true
+	   remote.auto_sync_after 10.minutes 
+	 end
+ end
+
+==== Rake sync
+/Not yet implemented./
+
+*Important:* In order to make use of synchronization you'll have to run the following migration:
+ 
+ class CreateHasRemoteSynchronizations < ActiveRecord::Migration
+   def self.up
+     create_table :has_remote_synchronizations do |t|
+       t.string :model_name, :null => false
+       t.datetime :latest_change, :null => false
+       t.datetime :created_at
+     end
+   end
+
+   def self.down
+     drop_table :has_remote_synchronizations
+   end
+ end
+
 === Documentation
 
 To generate RDocs for this plugin, run:

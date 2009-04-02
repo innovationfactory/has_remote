@@ -1,9 +1,27 @@
-module HasRemote #:nodoc:
+# The main module for tyhe has_remote plugin. Please see README for more information.
+#
+module HasRemote
   
-  def self.included(base)
+  def self.included(base) #:nodoc:
     base.extend ClassMethods
   end
   
+  # Returns an array of all models that have a remote.
+  #
+  def self.models
+    # Make sure all models are loaded:
+    Dir[Rails.root.join('app', 'models', '*.rb')].each { |f| require f }
+
+    @models ||= []
+  end
+  
+  # Updates cached attributes of all models that have a remote.
+  # Also see HasRemote::Cache
+  #
+  def self.update_cached_attributes!
+    models.each(&:update_cached_attributes!)
+  end
+      
   module ClassMethods
     
     # Gives your local ActiveRecord model a remote proxy (ActiveResource::Base),
@@ -44,11 +62,13 @@ module HasRemote #:nodoc:
     def has_remote(options, &block)
       @remote_class = options[:through] ? options.delete(:through).constantize : self.const_set("Remote", ActiveResource::Base.clone)
       @remote_key = options.delete(:remote_key) || :remote_id
+      @cached_attributes = []
       
-      # create getter methods
+      # create extra class methods
       class << self
         attr_reader :remote_class
         attr_reader :remote_key
+        include HasRemote::Cache
       end
       
       # set ARes to look for correct resource (only if not manually specified)
@@ -64,6 +84,7 @@ module HasRemote #:nodoc:
       block.call( Config.new(self) ) if block_given?
       
       include InstanceMethods
+      HasRemote.models << self
     end
     
   end
@@ -77,6 +98,17 @@ module HasRemote #:nodoc:
         @remote = self.class.remote_class.find(self.send(self.class.remote_key))
       end
       @remote
+    end
+    
+    # Synchronizes all locally cached remote attributes.
+    #
+    def update_cached_attributes!
+      unless self.class.cached_attributes.empty?
+        self.class.cached_attributes.each do |attr|
+          write_attribute(attr, send(attr))
+        end
+        save! if changed?
+      end
     end
     
     # Checks whether a remote proxy exists.
@@ -94,15 +126,16 @@ module HasRemote #:nodoc:
       @base = base
     end
     
-    def attribute(attr_name)
+    def attribute(attr_name, options = {})
       @base.class_eval <<-RB
         def #{attr_name}
           remote.nil? ? nil : remote.send(:#{attr_name})
         end
         def #{attr_name}=(arg)
-          raise NoMethodError.new("#{attr_name} is a remote attribute and therefor can't be set.")
+          raise NoMethodError.new("Remote attributes can't be set in this version of has_remote.")
         end
       RB
+      @base.cached_attributes << attr_name if options[:local_cache]
     end
   end
   
