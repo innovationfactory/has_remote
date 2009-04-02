@@ -1,20 +1,22 @@
 = HasRemote
 
-Gives your local ActiveRecord model a remote proxy (ActiveResource::Base),
+Gives your local ActiveRecord model a remote proxy (ActiveResource),
 which enables you to look for certain attributes remotely.
 
 Before usage, make sure your model's table has an integer column called <tt>remote_id</tt>.
 (This name can be overridden, see options.)
 
-=== Options
+=== Installation
 
-[:remote_key]  The name of the column used to store the id of the remote resource. Defaults to <tt>remote_id</tt>.
+ script/plugins install git://github.com/innovationfactory/has_remote.git
 
-[:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
-                                see http://api.rubyonrails.org/classes/ActiveResource/Base.html      
-[:through]     Optional custom ActiveResource class name to use for the proxy. If not set, a default class called
-               "<ModelName>::Remote" will be created dynamically. *Note* that any ActiveResource
-               configuration options will still be applied to this class.
+ script/generate has_remote_migration
+
+ rake db:migrate
+
+=== Usage
+
+See documentation for HasRemote::ClassMethods#has_remote.
 
 === Examples
 
@@ -56,55 +58,38 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
-=== Local cache
+=== Caching attributes locally
 
 In case you need to do database operations on remote attributes, like sorting, you can tell has_remote
 to locally cache specific attributes in the following manner:
 
  class User < ActiveRecord::Base
-	 has_remote :site => '...' do |remote|
-	   remote.attribute :username, :local_cache => true
-	 end
+   has_remote :site => '...' do |remote|
+     remote.attribute :username, :local_cache => true
+   end
  end
 
 This assumes you have a 'username' column in the 'users' table.
 
-has_remote provides three ways of keeping you locally cached attributes in sync with their remote values.
+Cached attributes will be updated every time the record is saved. Also there are two other
+ways of keeping the locally cached attributes in sync with their remote values.
 
- 1. Manual sync
- 2. Auto-sync
- 3. Rake task has_remote:sync
+1. Manual synchronization
+2. Rake task hr:sync
 
-==== Manual sync
+==== Manual synchronization
+
 See HasRemote::Cache for more information on the available methods for triggering synchronization manually.
 
-==== Auto-sync
+==== Rake hr:sync
 
- class User < ActiveRecord::Base
-	 has_remote :site => '...' do |remote|
-	   remote.attribute :username, :local_cache => true
-	   remote.auto_sync_after 10.minutes 
-	 end
- end
+The rake task 'hr:sync' is provided to allow easy synchronization from the command line.
+You could set up a cron tab that runs this task regularly to keep the data in sync.
 
-==== Rake sync
-/Not yet implemented./
+By default hr:sync updates all records of each model that has remotes. You can limit this to
+certain models by using the MODELS parameter:
 
-*Important:* In order to make use of synchronization you'll have to run the following migration:
- 
- class CreateHasRemoteSynchronizations < ActiveRecord::Migration
-   def self.up
-     create_table :has_remote_synchronizations do |t|
-       t.string :model_name, :null => false
-       t.datetime :latest_change, :null => false
-       t.datetime :created_at
-     end
-   end
-
-   def self.down
-     drop_table :has_remote_synchronizations
-   end
- end
+ rake hr:sync MODELS=Contact,Company
 
 === Documentation
 

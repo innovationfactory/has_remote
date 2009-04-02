@@ -1,0 +1,13 @@
+class CreateHasRemoteSynchronizations < ActiveRecord::Migration
+  def self.up
+    create_table :has_remote_synchronizations do |t|
+      t.string :model_name, :null => false
+      t.datetime :latest_change, :null => false
+      t.datetime :created_at
+    end
+  end
+
+  def self.down
+    drop_table :has_remote_synchronizations
+  end
+end

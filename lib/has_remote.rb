@@ -1,4 +1,4 @@
-# The main module for tyhe has_remote plugin. Please see README for more information.
+# The main module for the has_remote plugin. Please see README for more information.
 #
 module HasRemote
   
@@ -68,6 +68,7 @@ module HasRemote
       class << self
         attr_reader :remote_class
         attr_reader :remote_key
+        attr_accessor :auto_sync_after
         include HasRemote::Cache
       end
       
@@ -121,11 +122,27 @@ module HasRemote
     end
   end
   
-  class Config #:nodoc:
-    def initialize(base)
+  class Config
+    def initialize(base) #:nodoc:
       @base = base
     end
     
+    # Defines a remote attribute. Adds a getter method on instances, which delegates to the remote object.
+    #
+    # *Options*
+    #
+    # [:local_cache]  If set to true the attribute will also be saved locally. See README for more information
+    #                 about caching and synchronization.
+    #
+    # *Example*
+    # 
+    #  class User < ActiveRecord::Base
+    #    has_remote :site => '...' do |remote|
+    #      remote.attribute :name, :local_cache => true
+    #      remote.attribute :email
+    #    end
+    #  end
+    #
     def attribute(attr_name, options = {})
       @base.class_eval <<-RB
         def #{attr_name}
@@ -137,6 +154,7 @@ module HasRemote
       RB
       @base.cached_attributes << attr_name if options[:local_cache]
     end
+    
   end
   
 end

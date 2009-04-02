@@ -13,9 +13,12 @@ module HasRemote
   # You can also update a single record:
   #  @user.update_cached_attributes!
   #
+  # You could make your application call these methods whenever you need to be sure
+  # your cache is up to date.
+  #
   module Cache
 
-    # Returns an array of all attributes that are locally chached.
+    # Returns an array of all attributes that are locally cached.
     #
     def cached_attributes
       @cached_attributes ||= []
