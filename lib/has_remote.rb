@@ -60,7 +60,10 @@ module HasRemote
     #  # => "User name from remote server"
     #
     def has_remote(options, &block)
-      @remote_class = options[:through] ? options.delete(:through).constantize : self.const_set("Remote", ActiveResource::Base.clone)
+      unless self.const_defined?("Remote") # Never try this twice
+        @remote_class = options[:through] ? options.delete(:through).constantize : self.const_set("Remote", ActiveResource::Base.clone)
+      end
+      
       @remote_key = options.delete(:remote_key) || :remote_id
       @cached_attributes = []
       
@@ -84,6 +87,9 @@ module HasRemote
       
       block.call( Config.new(self) ) if block_given?
       
+      # make sure remote attributes are synced after every save
+      after_save :update_cached_attributes!
+      
       include InstanceMethods
       HasRemote.models << self
     end
@@ -103,12 +109,14 @@ module HasRemote
     
     # Synchronizes all locally cached remote attributes.
     #
+    # Note that when the remote does no longer exist, all remote attributes will be
+    # set to nil.
     def update_cached_attributes!
       unless self.class.cached_attributes.empty?
         self.class.cached_attributes.each do |attr|
           write_attribute(attr, send(attr))
         end
-        save! if changed?
+        update_without_callbacks if changed?
       end
     end
     
