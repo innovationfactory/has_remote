@@ -1,5 +1,5 @@
 module HasRemoteSpec
-  class User
+  class User < ActiveRecord::Base
     include HasRemote
     attr_accessor :remote_id
     
