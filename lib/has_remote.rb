@@ -29,7 +29,7 @@ module HasRemote
     # 
     # ==== Options
     # 
-    # [:remote_key]  The name of the column used to store the id of the remote resource. Defaults to <tt>remote_id</tt>.
+    # [:remote_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
     #
     # [:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
     #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html      
@@ -42,6 +42,9 @@ module HasRemote
     #  class User < ActiveRecord::Base
     #    has_remote :site => 'http://people.local'
     #  end
+    #
+    #  # In a migration:
+    #  add_column :users, :remote_id, :integer
     #
     #  User.find(1).remote
     #  # => #<User::Remote> (inherits from ActiveResource::Base)
@@ -72,7 +75,7 @@ module HasRemote
         attr_reader :remote_class
         attr_reader :remote_key
         attr_accessor :auto_sync_after
-        include HasRemote::Cache
+        include HasRemote::Caching
       end
       
       # set ARes to look for correct resource (only if not manually specified)
@@ -100,8 +103,12 @@ module HasRemote
     
     # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. 
     #
-    def remote
-      if @remote.nil? && has_remote?
+    # *Arguments*
+    #
+    # - <tt>force_reload</tt>:  Forces a reload from the remote server if set to true. Defaults to false.
+    #
+    def remote(force_reload = false)
+      if force_reload || (@remote.nil? && has_remote?)
         @remote = self.class.remote_class.find(self.send(self.class.remote_key))
       end
       @remote
@@ -111,10 +118,11 @@ module HasRemote
     #
     # Note that when the remote does no longer exist, all remote attributes will be
     # set to nil.
+    #
     def update_cached_attributes!
       unless self.class.cached_attributes.empty?
         self.class.cached_attributes.each do |attr|
-          write_attribute(attr, send(attr))
+          write_attribute(attr, remote(true).send(attr))
         end
         update_without_callbacks if changed?
       end

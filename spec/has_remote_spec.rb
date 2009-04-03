@@ -1,5 +1,12 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
+describe HasRemote do
+  it "should know about registered models" do
+    HasRemote.should respond_to(:models)
+    HasRemote.models.should include(User, Book)
+  end
+end
+
 describe HasRemoteSpec::User do
  
   it "should respond to 'remote_class' and 'remote_key'" do
@@ -11,8 +18,7 @@ describe HasRemoteSpec::User do
   it "should set remote class' configuration" do
      User.remote_class.site.should_not be_nil
      User.remote_class.element_name.should == "user"
-  end
-  
+  end  
 
   describe "instances" do
     
@@ -29,9 +35,13 @@ describe HasRemoteSpec::User do
       @user.has_remote?.should be_true
     end
     
+    it "should use a custom remote key" do
+      Book.remote_key.should == :custom_remote_id
+    end
+    
     it "should have a custom remote" do
       @book = Book.new
-      @book.remote_id = 1
+      @book.custom_remote_id = 1
       
       HasRemoteSpec::RemoteBook.should_receive(:find).any_number_of_times.with(1).and_return( mock(:resource, :title => "Ruby for Rails") )
       

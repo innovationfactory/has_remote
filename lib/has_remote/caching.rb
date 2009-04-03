@@ -16,7 +16,7 @@ module HasRemote
   # You could make your application call these methods whenever you need to be sure
   # your cache is up to date.
   #
-  module Cache
+  module Caching
 
     # Returns an array of all attributes that are locally cached.
     #
@@ -44,7 +44,7 @@ module HasRemote
     # since the last successful synchronization.
     #
     def update_cached_attributes!
-      print logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
+      logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
         begin
           changed_objects = changed_remotes_since( cache_updated_at )
           update_count = 0
@@ -58,30 +58,30 @@ module HasRemote
                   end
                   if local_record.save!
                     update_count += 1
-                    print logger.info( " - Updated #{name.downcase} with id #{local_record.id}.\n" )
+                    logger.info( " - Updated #{name.downcase} with id #{local_record.id}.\n" )
                   end
                 else # If local record not found
-                  print logger.info( " - No local #{name.downcase} has remote with id #{remote_record.id}.\n" )
+                  logger.info( " - No local #{name.downcase} has remote with id #{remote_record.id}.\n" )
                 end
               end
             end
           else # If no stale changed objects
-            print logger.info( " - No #{table_name} to update.\n" )
+            logger.info( " - No #{table_name} to update.\n" )
           end
         rescue => e
-          print logger.warn( " - Synchronization of #{table_name} failed:\n#{e}" )
+          logger.warn( " - Synchronization of #{table_name} failed:\n#{e}" )
         else # If syncing successful
           self.cache_updated_at = changed_objects.map(&:updated_at).sort.last if changed_objects.any?  
-          print logger.info( " - Updated #{update_count} #{table_name}.\n" ) if update_count > 0
+          logger.info( " - Updated #{update_count} #{table_name}.\n" ) if update_count > 0
         ensure
-          print logger.info( "*** Stopped synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
+          logger.info( "*** Stopped synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
         end
     end
     
     # Time of the last successful synchronization.
     #
     def cache_updated_at
-      HasRemote::Synchronization.find_by_model_name(self.name, :order => 'latest_change DESC').latest_change rescue nil
+      HasRemote::Synchronization.for(self.name).latest_change
     end
     
     

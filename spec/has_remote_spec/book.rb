@@ -1,11 +1,7 @@
 module HasRemoteSpec
   class RemoteBook < ActiveResource::Base; end
   
-  class Book < ActiveRecord::Base
-    include HasRemote
-    attr_accessor :remote_id
-    
-    has_remote :through => "HasRemoteSpec::RemoteBook"
-
+  class Book < ActiveRecord::Base   
+    has_remote :through => "HasRemoteSpec::RemoteBook", :remote_key => :custom_remote_id
   end
 end
