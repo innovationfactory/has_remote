@@ -11,10 +11,6 @@ which enables you to look for certain attributes remotely.
 
  rake db:migrate
 
-=== Usage
-
-See documentation for HasRemote::ClassMethods#has_remote.
-
 === Examples
 
 First make sure your records have a reference to a remote resource:
@@ -26,7 +22,7 @@ First make sure your records have a reference to a remote resource:
  end
 
  User.find(1).remote
- # => #<User::Remote> (inherits from ActiveResource::Base)
+ # => #<User::Remote:...> (ActiveResource instance)
  
  User.find(1).remote.username
  # => "User name from remote server"
@@ -59,6 +55,8 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
+See documentation for HasRemote::ClassMethods#has_remote for a description of all options.
+
 === Caching attributes locally
 
 In case you need to do database operations on remote attributes, like sorting, you can tell has_remote
@@ -88,7 +86,7 @@ The rake task 'hr:sync' is provided to allow easy synchronization from the comma
 You could set up a cron tab that runs this task regularly to keep the data in sync.
 
 By default hr:sync updates all records of each model that has remotes. You can limit this to
-certain models by using the MODELS parameter:
+certain models by using the MODELS variable:
 
  rake hr:sync MODELS=Contact,Company
 
