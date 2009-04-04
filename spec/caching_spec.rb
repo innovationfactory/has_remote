@@ -9,6 +9,10 @@ context "Given existing remote resources" do
   end
   
   describe "a user" do
+    
+    it "should respond to :cached_attributes"
+    it "should respond to :changed_remotes_since"
+    it "should respond to :cache_updated_at"
   
     it "should update its remote attributes when saved" do
       user = User.new :remote_id => 1
@@ -48,6 +52,8 @@ context "Given existing remote resources" do
 
         HasRemote::Synchronization.for("HasRemoteSpec::User").latest_change.should == yesterday
       end
+      
+      it "should fail save"
     
     end
   
