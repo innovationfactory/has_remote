@@ -80,7 +80,7 @@ ways of keeping the locally cached attributes in sync with their remote values.
 
 ==== Manual synchronization
 
-See HasRemote::Cache for more information on the available methods for triggering synchronization manually.
+See HasRemote::Caching for more information on the available methods for triggering synchronization manually.
 
 ==== Rake hr:sync
 
@@ -108,7 +108,7 @@ To run the specs of the plugin, from the has_remote directory run:
 
 === More information & patches
 
-Questions, requests and patches can be directed to sjoerd.andringa@innovationfactory.nl.
+Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]nl.
 
 
 Copyright (c) 2009 Innovation Factory.
