@@ -10,9 +10,29 @@ context "Given existing remote resources" do
   
   describe "a user" do
     
-    it "should respond to :cached_attributes"
-    it "should respond to :changed_remotes_since"
-    it "should respond to :cache_updated_at"
+    it "should return cached_attributes" do
+      User.should respond_to(:cached_attributes)
+      User.cached_attributes.should include(:email)
+    end
+    
+    it "should return changed remotes since yesterday" do
+      user_1, user_2 = mock(:user), mock(:user)
+      time = 1.day.ago
+      User::Remote.should_receive(:find).with(:all,{:from => :updated, :params=>{:since=>time.to_s}}).once.and_return([user_1, user_2])
+      
+      User.should respond_to(:changed_remotes_since)
+      User.changed_remotes_since(time).should include(user_1, user_2)
+    end
+    
+    it "should find last synchronization time" do
+      times = []
+      1.upto(3) do |i|
+        times << i.days.ago
+        HasRemote::Synchronization.create(:model_name => 'HasRemoteSpec::User', :latest_change => times.last)
+      end
+      User.should respond_to(:cache_updated_at)
+      User.cache_updated_at.to_s.should == times.first.to_s
+    end
   
     it "should update its remote attributes when saved" do
       user = User.new :remote_id => 1
@@ -53,7 +73,37 @@ context "Given existing remote resources" do
         HasRemote::Synchronization.for("HasRemoteSpec::User").latest_change.should == yesterday
       end
       
-      it "should fail save"
+      describe "that fails" do
+        
+        before(:each) do
+          
+          @failure = lambda {
+            user_1, user_2 = User.create!(:remote_id => 1), User.create!(:remote_id => 2)
+
+            yesterday = DateTime.parse 1.day.ago.to_s
+
+            resources = [
+              mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => yesterday),
+              mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago)
+            ]
+            
+            User.stub!(:changed_remotes_since).and_return(resources)
+            
+            resources.last.should_receive(:send).and_raise "All hell breaks loose" # Raise when attr is read from resource 2.
+            
+            User.update_cached_attributes!
+          }
+        end
+        
+        it "should fail slitently" do
+          @failure.should_not raise_error
+        end
+      
+        it "should not create a synchronization record" do
+          @failure.should_not change(HasRemote::Synchronization, :count)
+        end
+        
+      end
     
     end
   
@@ -76,6 +126,7 @@ context "Given existing remote resources" do
 end
 
 def stub_resource(id, attrs)
-  resource = mock(:user, attrs)
+  resource = mock(:user, {:id => id}.merge(attrs))
   User::Remote.stub!(:find).with(id).and_return(resource)
+  resource
 end

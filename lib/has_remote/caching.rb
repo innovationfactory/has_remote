@@ -30,13 +30,16 @@ module HasRemote
     # it queries '/updated?since=<time>' on your resources URL, where 'time' is
     # the latest updated_at time of the last processed remote objects.
     #
-    # You may need to override this method in your model to match your host's REST API:
+    # You may need to override this method in your model to match your host's REST API or to change
+    # the default time:
     #
-    #  def self.changed_remotes_since(time)
+    #  def self.changed_remotes_since(time = nil)
+    #    time ||= 12.hours.ago
     #    User::Remote.find :all, :from => :search, :params => {:updated_since => time.strftime('...') }
     #  end
     #
-    def changed_remotes_since(time)
+    def changed_remotes_since(time = nil)
+      time ||= 1.week.ago 
       remote_class.find :all, :from => :updated, :params => {:since => time.to_s}  
     end
     
@@ -69,7 +72,7 @@ module HasRemote
             logger.info( " - No #{table_name} to update.\n" )
           end
         rescue => e
-          logger.warn( " - Synchronization of #{table_name} failed:\n#{e}" )
+          logger.warn( " - Synchronization of #{table_name} failed: #{e}" )
         else # If syncing successful
           self.cache_updated_at = changed_objects.map(&:updated_at).sort.last if changed_objects.any?  
           logger.info( " - Updated #{update_count} #{table_name}.\n" ) if update_count > 0
