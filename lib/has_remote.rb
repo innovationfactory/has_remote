@@ -160,11 +160,12 @@ module HasRemote
     #  end
     #
     def attribute(attr_name, options = {})
+      method_name = options[:as] || attr_name
       @base.class_eval <<-RB
-        def #{attr_name}
+        def #{method_name}
           remote.nil? ? nil : remote.send(:#{attr_name})
         end
-        def #{attr_name}=(arg)
+        def #{method_name}=(arg)
           raise NoMethodError.new("Remote attributes can't be set in this version of has_remote.")
         end
       RB
