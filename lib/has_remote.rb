@@ -149,13 +149,14 @@ module HasRemote
     #
     # [:local_cache]  If set to true the attribute will also be saved locally. See README for more information
     #                 about caching and synchronization.
+    # [:as]           Optionally map remote attribute to this name.
     #
     # *Example*
     # 
     #  class User < ActiveRecord::Base
     #    has_remote :site => '...' do |remote|
     #      remote.attribute :name, :local_cache => true
-    #      remote.attribute :email
+    #      remote.attribute :email, :as => :email_address
     #    end
     #  end
     #
