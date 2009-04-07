@@ -10,7 +10,7 @@ module HasRemote
   #
   def self.models
     # Make sure all models are loaded:
-    Dir[File.join(RAILS_ROOT, 'app', 'models', '*.rb')].each { |f| require f }
+    Dir[File.join(RAILS_ROOT, 'app', 'models', '*.rb')].each { |f| require_dependency f }
 
     @models ||= []
   end
