@@ -7,7 +7,7 @@ describe HasRemote do
   end
 end
 
-describe HasRemoteSpec::User do
+describe "A model thaht has a remote" do
  
   it "should respond to 'remote_class' and 'remote_key'" do
     User.should respond_to(:remote_class, :remote_key)
@@ -18,7 +18,11 @@ describe HasRemoteSpec::User do
   it "should set remote class' configuration" do
      User.remote_class.site.should_not be_nil
      User.remote_class.element_name.should == "user"
-  end  
+  end
+  
+  it "should return remote attributes" do
+    User.remote_attributes.should include(:name, :email)
+  end
 
   describe "instances" do
     

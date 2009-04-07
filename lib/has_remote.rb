@@ -68,13 +68,17 @@ module HasRemote
       end
       
       @remote_key = options.delete(:remote_key) || :remote_id
-      @cached_attributes = []
-      
+
       # create extra class methods
       class << self
         attr_reader :remote_class
         attr_reader :remote_key
         attr_accessor :auto_sync_after
+        
+        def remote_attributes
+          @remote_attributes ||= []
+        end
+        
         include HasRemote::Caching
       end
       
@@ -170,6 +174,7 @@ module HasRemote
           raise NoMethodError.new("Remote attributes can't be set in this version of has_remote.")
         end
       RB
+      @base.remote_attributes << attr_name
       @base.cached_attributes << attr_name if options[:local_cache]
     end
     
