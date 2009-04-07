@@ -73,7 +73,6 @@ module HasRemote
       class << self
         attr_reader :remote_class
         attr_reader :remote_key
-        attr_accessor :auto_sync_after
         
         def remote_attributes
           @remote_attributes ||= []
