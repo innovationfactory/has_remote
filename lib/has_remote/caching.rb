@@ -72,8 +72,7 @@ module HasRemote
       HasRemote::Synchronization.for(self.name).latest_change
     end
     
-    
-    protected
+  private
 
     def cache_updated_at=(time) #:nodoc:
       HasRemote::Synchronization.create!(:model_name => self.name, :latest_change => time)
