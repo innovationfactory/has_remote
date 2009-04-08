@@ -18,7 +18,7 @@ Only if you require locally cached attributes and synchronization of those:
 First make sure your records have a reference to a remote resource:
   add_column :users, :remote_id, :integer
 	
-The default key is 'remote_id', but this can be changed, see options for {has_remote}[link:classes/HasRemote/ClassMethods.html#M000007].
+The default key is 'remote_id', but this can be changed, see options for has_remote.
 
  class User < ActiveRecord::Base
    has_remote :site => 'http://people.local'
@@ -61,7 +61,7 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
-See documentation for {has_remote}[link:classes/HasRemote/ClassMethods.html#M000007] for a description of all options.
+See documentation for has_remote for a description of all options.
 
 === Caching attributes locally
 
@@ -83,7 +83,7 @@ ways of keeping the locally cached attributes in sync with their remote values.
 2. Rake task hr:sync
 
 Synchronization automatically requests all remote resources that have been changed since the last successful synchronization.
-You may need to override {changed_remotes_since}[link:classes/HasRemote/Caching.html#M000004] in your model to match your host's REST API.
+You may need to override the changed_remotes_since class method in your model to match your host's REST API.
 
 ==== Manual synchronization
 
