@@ -71,7 +71,7 @@ to locally cache specific attributes in the following manner:
  class User < ActiveRecord::Base
    has_remote :site => '...' do |remote|
      remote.attribute :username, :local_cache => true
-		 remote.attribute :email_address, :as => :email, :local_cache => true
+     remote.attribute :email_address, :as => :email, :local_cache => true
    end
  end
 
