@@ -71,10 +71,12 @@ to locally cache specific attributes in the following manner:
  class User < ActiveRecord::Base
    has_remote :site => '...' do |remote|
      remote.attribute :username, :local_cache => true
+		 remote.attribute :email_address, :as => :email, :local_cache => true
    end
  end
 
-This assumes you also have a 'username' column in the local 'users' table.
+This assumes you also have a 'username' and 'email' column in the local 'users' table. Note that when using the
+:as option the local column is assumed to be named after this value.
 
 Cached attributes will be updated every time the record is saved. Also there are two other
 ways of keeping the locally cached attributes in sync with their remote values.

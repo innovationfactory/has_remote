@@ -12,7 +12,7 @@ context "Given existing remote resources" do
     
     it "should return cached_attributes" do
       User.should respond_to(:cached_attributes)
-      User.cached_attributes.should include(:email)
+      User.cached_attributes.should include([:email, :email])
     end
     
     it "should return changed remotes since yesterday" do

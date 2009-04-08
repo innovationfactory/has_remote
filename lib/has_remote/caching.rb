@@ -57,9 +57,9 @@ module HasRemote
                 local_records = find(:all, :conditions => ["#{remote_key} = ?", remote_record.id])
                 unless local_records.empty?
                   local_records.each do |local_record| # Usually just one
-                    cached_attributes.each do |attr|
+                    cached_attributes.each do |remote_attr, local_attr|
                       # Write remote value to local record for each cached attribute.
-                      local_record.send :write_attribute, attr, remote_record.send(attr) 
+                      local_record.send :write_attribute, local_attr, remote_record.send(remote_attr) 
                     end
                     if local_record.save!
                       update_count += 1

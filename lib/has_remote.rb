@@ -127,8 +127,8 @@ module HasRemote
     #
     def update_cached_attributes!
       unless self.class.cached_attributes.empty?
-        self.class.cached_attributes.each do |attr|
-          write_attribute(attr, remote(true).send(attr))
+        self.class.cached_attributes.each do |remote_attr, local_attr|
+          write_attribute(local_attr, remote(true).send(remote_attr))
         end
         update_without_callbacks if changed?
       end
@@ -177,7 +177,7 @@ module HasRemote
         end
       RB
       @base.remote_attributes << attr_name
-      @base.cached_attributes << attr_name if options[:local_cache]
+      @base.cached_attributes << [attr_name, method_name] if options[:local_cache]
     end
     
   end
