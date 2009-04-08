@@ -31,7 +31,7 @@ module HasRemote
     # the latest updated_at time of the last processed remote objects.
     #
     # You may need to override this method in your model to match your host's REST API or to change
-    # the default time:
+    # the default time, e.g.:
     #
     #  def self.changed_remotes_since(time = nil)
     #    time ||= 12.hours.ago

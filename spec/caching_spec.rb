@@ -95,7 +95,7 @@ context "Given existing remote resources" do
           }
         end
         
-        it "should fail slitently" do
+        it "should do it silently" do
           @failure.should_not raise_error
         end
       

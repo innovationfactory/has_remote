@@ -51,11 +51,14 @@ module HasRemote
     #  User.find(1).remote.username
     #  # => "User name from remote server"
     #
-    # <tt>has_remote</tt> also takes a block which can be used to specify remote attributes:
+    # has_remote also takes a block which is passed in a HasRemote::Config object which can be used to specify
+    # remote attributes:
     #
     #  class User < ActiveRecord::Base
     #    has_remote :site => '...' do |remote|
     #      remote.attribute :username
+    #      remote.attribute :full_name, :local_cache => true
+    #      remote.attribute :email_address, :as => :email
     #    end 
     #  end
     #
@@ -74,7 +77,7 @@ module HasRemote
         attr_reader :remote_class
         attr_reader :remote_key
         
-        def remote_attributes
+        def remote_attributes # :nodoc:
           @remote_attributes ||= []
         end
         

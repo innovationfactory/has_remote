@@ -7,6 +7,8 @@ which enables you to look for certain attributes remotely.
 
  script/plugins install git://github.com/innovationfactory/has_remote.git
 
+Only if you require locally cached attributes and synchronization of those:
+
  script/generate has_remote_migration
 
  rake db:migrate
@@ -14,15 +16,16 @@ which enables you to look for certain attributes remotely.
 === Examples
 
 First make sure your records have a reference to a remote resource:
-
- add_column :users, :remote_id, :integer # Default is 'remote_id', but can be changed, see options for has_remote.
+  add_column :users, :remote_id, :integer
+	
+The default key is 'remote_id', but this can be changed, see options for {has_remote}[link:classes/HasRemote/ClassMethods.html#M000007].
 
  class User < ActiveRecord::Base
    has_remote :site => 'http://people.local'
  end
 
  User.find(1).remote
- # => #<User::Remote:...> (ActiveResource instance)
+ # => #<User::Remote:...> (ActiveResource object)
  
  User.find(1).remote.username
  # => "User name from remote server"
@@ -40,6 +43,9 @@ has_remote optionally takes a block which can be used to specify remote attribut
 
 If you don't need to instantiate a local record, calling the remote class directly is possible too:
 
+ User.remote_class
+ # => User::Remote (ActiveResource class)
+
  User::Remote.find(1)
 
 Note that the User::Remote class only exists if User is set up to have a remote and has been loaded.
@@ -55,7 +61,7 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
-See documentation for HasRemote::ClassMethods#has_remote for a description of all options.
+See documentation for {has_remote}[link:classes/HasRemote/ClassMethods.html#M000007] for a description of all options.
 
 === Caching attributes locally
 
@@ -75,6 +81,9 @@ ways of keeping the locally cached attributes in sync with their remote values.
 
 1. Manual synchronization
 2. Rake task hr:sync
+
+Synchronization automatically requests all remote resources that have been changed since the last successful synchronization.
+You may need to override {changed_remotes_since}[link:classes/HasRemote/Caching.html#M000004] in your model to match your host's REST API.
 
 ==== Manual synchronization
 
