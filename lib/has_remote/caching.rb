@@ -54,14 +54,17 @@ module HasRemote
           if changed_objects.any?
             transaction do
               changed_objects.each do |remote_record|
-                if local_record = find(:first, :conditions => ["#{remote_key} = ?", remote_record.id])
-                  cached_attributes.each do |attr|
-                    # Write remote value to local record for each cached attribute.
-                    local_record.send :write_attribute, attr, remote_record.send(attr) 
-                  end
-                  if local_record.save!
-                    update_count += 1
-                    logger.info( " - Updated #{name.downcase} with id #{local_record.id}.\n" )
+                local_records = find(:all, :conditions => ["#{remote_key} = ?", remote_record.id])
+                unless local_records.empty?
+                  local_records.each do |local_record| # Usually just one
+                    cached_attributes.each do |attr|
+                      # Write remote value to local record for each cached attribute.
+                      local_record.send :write_attribute, attr, remote_record.send(attr) 
+                    end
+                    if local_record.save!
+                      update_count += 1
+                      logger.info( " - Updated #{name.downcase} with id #{local_record.id}.\n" )
+                    end
                   end
                 else # If local record not found
                   logger.info( " - No local #{name.downcase} has remote with id #{remote_record.id}.\n" )
