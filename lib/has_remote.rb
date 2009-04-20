@@ -66,9 +66,11 @@ module HasRemote
     #  # => "User name from remote server"
     #
     def has_remote(options, &block)
-      unless self.const_defined?("Remote") # Never try this twice
-        @remote_class = options[:through] ? options.delete(:through).constantize : self.const_set("Remote", ActiveResource::Base.clone)
+      unless options[:through] || self.const_defined?("Remote")
+        self.const_set("Remote", ActiveResource::Base.clone)
       end
+      
+      @remote_class = options[:through] ? options.delete(:through).constantize : self::Remote
       
       @remote_key = options.delete(:remote_key) || :remote_id
 
@@ -76,6 +78,7 @@ module HasRemote
       class << self
         attr_reader :remote_class
         attr_reader :remote_key
+        attr_reader :remote_finder
         
         def remote_attributes # :nodoc:
           @remote_attributes ||= []
@@ -114,8 +117,9 @@ module HasRemote
     # - <tt>force_reload</tt>:  Forces a reload from the remote server if set to true. Defaults to false.
     #
     def remote(force_reload = false)
-      if force_reload || (@remote.nil? && has_remote?)
-        @remote = self.class.remote_class.find(self.send(self.class.remote_key))
+      if force_reload || @remote.nil?
+        id = self.send(self.class.remote_key)
+        @remote = (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) rescue nil
       end
       @remote
     end
@@ -140,7 +144,7 @@ module HasRemote
       # NOTE ARes#exists? is broken:
       # https://rails.lighthouseapp.com/projects/8994/tickets/1223-activeresource-head-request-sends-headers-with-a-nil-key
       #
-      return !self.class.remote_class.find(self.send(self.class.remote_key)).nil? rescue false   
+      return !remote(true).nil? rescue false   
     end
   end
   
@@ -178,6 +182,23 @@ module HasRemote
       RB
       @base.remote_attributes << attr_name
       @base.cached_attributes << [attr_name, method_name] if options[:local_cache]
+    end
+    
+    # Lets you specify custom finder logic to find the record's remote object.
+    # It takes a block which is passed in the id of the remote object.
+    #
+    # *Example*
+    #
+    #  has_remote :site => "..." do |remote|
+    #    remote.finder do |id|
+    #      User::Remote.find :one, :from => :active, :params => {:uid => id}
+    #    end
+    #  end
+    #
+    # By default the finder method calls <tt>find(id)</tt> on the remote_class. 
+    #
+    def finder(&block)
+      @base.instance_variable_set "@remote_finder", block
     end
     
   end
