@@ -28,7 +28,9 @@ load(File.dirname(__FILE__) + "/schema.rb")
 # Require models
 require File.dirname(__FILE__) + '/has_remote_spec/user'
 require File.dirname(__FILE__) + '/has_remote_spec/book'
+require File.dirname(__FILE__) + '/has_remote_spec/product'
 
 # Create schortcuts 
 User = HasRemoteSpec::User
 Book = HasRemoteSpec::Book
+Product = HasRemoteSpec::Product

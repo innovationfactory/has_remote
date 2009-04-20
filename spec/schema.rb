@@ -9,6 +9,10 @@ ActiveRecord::Schema.define(:version => 0) do
     t.integer :remote_id
     t.string  :email
   end
+  
+  create_table :products do |t|
+    t.integer :remote_id
+  end
 
   create_table :has_remote_synchronizations do |t|
     t.string   :model_name, :null => false
