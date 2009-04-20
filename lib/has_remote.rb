@@ -187,15 +187,17 @@ module HasRemote
     # Lets you specify custom finder logic to find the record's remote object.
     # It takes a block which is passed in the id of the remote object.
     #
+    # (By default <tt>Model.remote_class.find(id)</tt> would be called.)
+    #
     # *Example*
     #
-    #  has_remote :site => "..." do |remote|
-    #    remote.finder do |id|
-    #      User::Remote.find :one, :from => :active, :params => {:uid => id}
+    #  class User < ActiveRecord::Base
+    #    has_remote :site => "..." do |remote|
+    #      remote.finder do |id|
+    #        User::Remote.find :one, :from => "users/active/#{id}.xml"
+    #      end
     #    end
     #  end
-    #
-    # By default the finder method calls <tt>find(id)</tt> on the remote_class. 
     #
     def finder(&block)
       @base.instance_variable_set "@remote_finder", block
