@@ -83,11 +83,11 @@ module HasRemote
     end
     
     def update_all_records_for_resource(resource) #:nodoc:
-      records = find(:all, :conditions => ["#{remote_key} = ?", resource.id])
+      records = find(:all, :conditions => ["#{remote_foreign_key} = ?", resource.send(remote_primary_key)])
       unless records.empty?
         records.each { |record| update_record_for_resource(record, resource) }
       else
-        logger.info( " - No local #{name.downcase} has remote with id #{resource.id}.\n" )
+        logger.info( " - No local #{name.downcase} has remote with id #{resource.send(remote_primary_key)}.\n" )
       end
     end
     
@@ -97,7 +97,7 @@ module HasRemote
       end
       if record.save!
         @update_count += 1
-        logger.info( " - Updated #{name.downcase} with id #{record.id}.\n" )
+        logger.info( " - Updated #{name.downcase} with id #{record.send(remote_primary_key)}.\n" )
       end
     end
 

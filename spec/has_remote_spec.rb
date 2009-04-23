@@ -11,10 +11,10 @@ end
 
 describe User do
  
-  it "should respond to 'remote_class' and 'remote_key'" do
-    User.should respond_to(:remote_class, :remote_key)
+  it "should respond to 'remote_class' and 'remote_foreign_key'" do
+    User.should respond_to(:remote_class, :remote_foreign_key)
     User.remote_class.should == User::Remote
-    User.remote_key.should == :remote_id
+    User.remote_foreign_key.should == :remote_id
   end
   
   it "should set remote class' configuration" do
@@ -71,7 +71,7 @@ end
 describe Book do
   
   it "should use a custom remote key" do
-    Book.remote_key.should == :custom_remote_id
+    Book.remote_foreign_key.should == :custom_remote_id
   end
   
   describe "instances" do

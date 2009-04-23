@@ -29,7 +29,8 @@ module HasRemote
     # 
     # ==== Options
     # 
-    # [:remote_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
+    # [:foreign_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
+    # [:remote_primary_key]  The name of the remote resource's primary key. Defaults to :id.
     #
     # [:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
     #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html      
@@ -72,13 +73,16 @@ module HasRemote
       
       @remote_class = options[:through] ? options.delete(:through).constantize : self::Remote
       
-      @remote_key = options.delete(:remote_key) || :remote_id
-
+      @remote_foreign_key = options.delete(:foreign_key) || :remote_id
+      
+      @remote_primary_key = options.delete(:remote_primary_key) || :id
+      
       # create extra class methods
       class << self
         attr_reader :remote_class
-        attr_reader :remote_key
+        attr_reader :remote_foreign_key
         attr_reader :remote_finder
+        attr_reader :remote_primary_key
         
         def remote_attributes # :nodoc:
           @remote_attributes ||= []
@@ -118,7 +122,7 @@ module HasRemote
     #
     def remote(force_reload = false)
       if force_reload || @remote.nil?
-        id = self.send(self.class.remote_key)
+        id = self.send(self.class.remote_foreign_key)
         @remote = (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) rescue nil
       end
       @remote
