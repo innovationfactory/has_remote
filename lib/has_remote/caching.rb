@@ -57,7 +57,7 @@ module HasRemote
           logger.info( " - No #{table_name} to update.\n" )
         end
       rescue => e
-        logger.warn( " - Synchronization of #{table_name} failed: #{e}" )
+        logger.warn( " - Synchronization of #{table_name} failed: #{e} \n #{e.backtrace}" )
       else
         self.cache_updated_at = changed_objects.map(&:updated_at).sort.last if changed_objects.any?  
         logger.info( " - Updated #{@update_count} #{table_name}.\n" ) if @update_count > 0
@@ -97,7 +97,7 @@ module HasRemote
       end
       if record.save!
         @update_count += 1
-        logger.info( " - Updated #{name.downcase} with id #{record.send(remote_primary_key)}.\n" )
+        logger.info( " - Updated #{name.downcase} with id #{record.id}.\n" )
       end
     end
 
