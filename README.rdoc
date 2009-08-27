@@ -1,7 +1,7 @@
 = HasRemote
 
-Gives your local ActiveRecord model a remote proxy (ActiveResource),
-which enables you to look for certain attributes remotely.
+Gives your local ActiveRecord model an ActiveResource equivalent,
+which enables you to look for certain attributes remotely using a RESTful webservice.
 
 === Installation
 
@@ -24,10 +24,13 @@ The default key is 'remote_id', but this can be changed, see options for has_rem
    has_remote :site => 'http://people.local'
  end
 
- User.find(1).remote
- # => #<User::Remote:...> (ActiveResource object)
+ User.remote_class
+ # => User::Remote (subclass of ActiveResource::Base)
+
+ @user.remote
+ # => #<User::Remote:...>
  
- User.find(1).remote.username
+ @user.remote.username
  # => "User name from remote server"
 
 has_remote optionally takes a block which can be used to specify remote attributes:
@@ -38,17 +41,10 @@ has_remote optionally takes a block which can be used to specify remote attribut
    end 
  end
 
- User.find(1).username
+ @user.username
  # => "User name from remote server"
 
-If you don't need to instantiate a local record, calling the remote class directly is possible too:
-
- User.remote_class
- # => User::Remote (ActiveResource class)
-
- User::Remote.find(1)
-
-Note that the User::Remote class only exists if User is set up to have a remote and has been loaded.
+Note that the current version of HasRemote only offers read-only support for remote attributes.
 
 The <tt>:through</tt> option enables you to specify your own ActiveResource class:
 
@@ -116,6 +112,9 @@ To run the specs of the plugin, from the has_remote directory run:
 (This requires you to have both RSpec and Shoulda installed.)
 
 === More information & patches
+
+- Simple example of how HasRemote simplifies your code: http://gist.github.com/176335
+- Simple API authentication with HasRemote: http://gist.github.com/174497 
 
 Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]nl.
 
