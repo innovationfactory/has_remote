@@ -48,6 +48,12 @@ context "Given existing remote resources" do
       user.update_attributes(:remote_id => 2)
       user[:email].should == "jane_remote@foo.bar"   
     end
+    
+    it "should not delegate cached remote attributes" do
+      user = User.create! :remote_id => 1
+      User::Remote.should_not_receive(:find)
+      user.email.should == "joeremote@foo.bar"
+    end
   end
 
   describe "synchronization" do

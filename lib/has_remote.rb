@@ -176,16 +176,24 @@ module HasRemote
     #
     def attribute(attr_name, options = {})
       method_name = options[:as] || attr_name
-      @base.class_eval <<-RB
-        def #{method_name}
-          remote.nil? ? nil : remote.send(:#{attr_name})
-        end
+      
+      @base.remote_attributes << attr_name
+      
+      unless options[:local_cache]
+        @base.class_eval <<-RB    
+          def #{method_name}
+            remote.nil? ? nil : remote.send(:#{attr_name})
+          end
+        RB
+      else
+        @base.cached_attributes << [attr_name, method_name]
+      end
+      
+      @base.class_eval <<-RB    
         def #{method_name}=(arg)
-          raise NoMethodError.new("Remote attributes can't be set in this version of has_remote.")
+          raise NoMethodError.new("Remote attributes can't be set directly in this version of has_remote.")
         end
       RB
-      @base.remote_attributes << attr_name
-      @base.cached_attributes << [attr_name, method_name] if options[:local_cache]
     end
     
     # Lets you specify custom finder logic to find the record's remote object.

@@ -22,9 +22,10 @@ module HasRemote
     #
     def cached_attributes
       @cached_attributes ||= []
-    end    
+    end
     
-    # Returns all remote objects that have been changed since the given time.
+    # Returns all remote objects that have been changed since the given time or one week ago if no
+    # time is given.
     #
     # This is used by the <tt>update_cached_attributes!</tt> class method. By default
     # it queries '/updated?since=<time>' on your resources URL, where 'time' is
