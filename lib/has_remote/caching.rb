@@ -93,7 +93,8 @@ module HasRemote
     end
     
     def update_record_for_resource(record, resource) #:nodoc:
-      cached_attributes.each do |remote_attr, local_attr|
+      cached_attributes.each do |remote_attr|
+        local_attr = remote_attribute_aliases[remote_attr] || remote_attr
         record.send :write_attribute, local_attr, resource.send(remote_attr) 
       end
       if record.save!

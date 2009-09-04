@@ -88,6 +88,10 @@ module HasRemote
           @remote_attributes ||= []
         end
         
+        def remote_attribute_aliases # :nodoc:
+          @remote_attribute_aliases ||= {}
+        end
+        
         include HasRemote::Caching
       end
       
@@ -135,7 +139,8 @@ module HasRemote
     #
     def update_cached_attributes!
       unless self.class.cached_attributes.empty?
-        self.class.cached_attributes.each do |remote_attr, local_attr|
+        self.class.cached_attributes.each do |remote_attr|
+          local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
           write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)
         end
         update_without_callbacks if changed?
@@ -178,6 +183,7 @@ module HasRemote
       method_name = options[:as] || attr_name
       
       @base.remote_attributes << attr_name
+      @base.remote_attribute_aliases = @base.remote_attribute_aliases.merge(attr_name => method_name) if options[:as]
       
       unless options[:local_cache]
         @base.class_eval <<-RB    
@@ -186,7 +192,7 @@ module HasRemote
           end
         RB
       else
-        @base.cached_attributes << [attr_name, method_name]
+        @base.cached_attributes << attr_name
       end
       
       @base.class_eval <<-RB    
