@@ -184,7 +184,7 @@ module HasRemote
       method_name = options[:as] || attr_name
       
       @base.remote_attributes << attr_name
-      @base.remote_attribute_aliases = @base.remote_attribute_aliases.merge(attr_name => method_name) if options[:as]
+      @base.remote_attribute_aliases = @base.remote_attribute_aliases.merge(attr_name => method_name)
       
       unless options[:local_cache]
         @base.class_eval <<-RB    

@@ -27,6 +27,7 @@ describe User do
   end
 
   it "should return remote attribute aliases" do
+    User.remote_attribute_aliases[:name].should == :name
     User.remote_attribute_aliases[:phone].should == :telephone
   end
 
