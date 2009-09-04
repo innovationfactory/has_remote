@@ -26,6 +26,10 @@ describe User do
     User.remote_attributes.should include(:name, :email)
   end
 
+  it "should return remote attribute aliases" do
+    User.remote_attribute_aliases[:phone].should == :telephone
+  end
+
   describe "instances" do
 
     before(:each) do

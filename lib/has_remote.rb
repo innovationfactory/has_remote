@@ -83,6 +83,7 @@ module HasRemote
         attr_reader :remote_foreign_key
         attr_reader :remote_finder
         attr_reader :remote_primary_key
+        attr_writer :remote_attribute_aliases
         
         def remote_attributes # :nodoc:
           @remote_attributes ||= []
