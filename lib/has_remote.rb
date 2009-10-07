@@ -108,8 +108,11 @@ module HasRemote
       
       block.call( Config.new(self) ) if block_given?
       
+      # After save callback in order to update cached attributes will be omitted when set to true
+      attr_accessor :skip_update_cache
+      
       # make sure remote attributes are synced after every save
-      after_save :update_cached_attributes!
+      after_save :update_cached_attributes!, :unless => lambda { |record| record.skip_update_cache }
       
       include InstanceMethods
       HasRemote.models << self
@@ -126,6 +129,7 @@ module HasRemote
     # - <tt>force_reload</tt>:  Forces a reload from the remote server if set to true. Defaults to false.
     #
     def remote(force_reload = false)
+      logger.debug ">>> remote called"
       if force_reload || @remote.nil?
         id = self.send(self.class.remote_foreign_key)
         @remote = (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) rescue nil
@@ -151,6 +155,7 @@ module HasRemote
     # Checks whether a remote proxy exists.
     #
     def has_remote?
+      logger.debug ">>> has_remote? called"
       # NOTE ARes#exists? is broken:
       # https://rails.lighthouseapp.com/projects/8994/tickets/1223-activeresource-head-request-sends-headers-with-a-nil-key
       #
@@ -187,20 +192,21 @@ module HasRemote
       @base.remote_attribute_aliases = @base.remote_attribute_aliases.merge(attr_name => method_name)
       
       unless options[:local_cache]
-        @base.class_eval <<-RB    
+        @base.class_eval <<-RB
+
           def #{method_name}
             remote.nil? ? nil : remote.send(:#{attr_name})
           end
+
+          def #{method_name}=(arg)
+            raise NoMethodError.new("Remote attributes can't be set directly in this version of has_remote.")
+          end
+
         RB
       else
         @base.cached_attributes << attr_name
       end
       
-      @base.class_eval <<-RB    
-        def #{method_name}=(arg)
-          raise NoMethodError.new("Remote attributes can't be set directly in this version of has_remote.")
-        end
-      RB
     end
     
     # Lets you specify custom finder logic to find the record's remote object.
