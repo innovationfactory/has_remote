@@ -129,7 +129,6 @@ module HasRemote
     # - <tt>force_reload</tt>:  Forces a reload from the remote server if set to true. Defaults to false.
     #
     def remote(force_reload = false)
-      logger.debug ">>> remote called"
       if force_reload || @remote.nil?
         id = self.send(self.class.remote_foreign_key)
         @remote = (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) rescue nil
@@ -155,7 +154,6 @@ module HasRemote
     # Checks whether a remote proxy exists.
     #
     def has_remote?
-      logger.debug ">>> has_remote? called"
       # NOTE ARes#exists? is broken:
       # https://rails.lighthouseapp.com/projects/8994/tickets/1223-activeresource-head-request-sends-headers-with-a-nil-key
       #
