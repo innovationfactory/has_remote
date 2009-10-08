@@ -10,7 +10,7 @@ context "Given existing remote resources" do
   
   describe "a user" do
     
-    it "should return cached_attributes" do
+    it "should return cached attributes" do
       User.should respond_to(:cached_attributes)
       User.cached_attributes.should include(:email)
     end
@@ -40,6 +40,14 @@ context "Given existing remote resources" do
    
       user.save!
       user[:email].should == "joeremote@foo.bar"
+    end
+    
+    it "should not update its remote attributes if 'skip_update_cache' is true" do
+      user = User.new :remote_id => 1, :skip_update_cache => true
+      user[:email].should be_nil
+   
+      user.save!
+      user[:email].should be_nil
     end
 
     it "should update its remote attributes when created and updated" do
