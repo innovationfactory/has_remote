@@ -112,7 +112,7 @@ module HasRemote
       attr_accessor :skip_update_cache
       
       # make sure remote attributes are synced after every save
-      after_save :update_cached_attributes!, :unless => lambda { |record| record.skip_update_cache }
+      before_save :update_cached_attributes!, :unless => :skip_update_cache
       
       include InstanceMethods
       HasRemote.models << self
@@ -147,7 +147,6 @@ module HasRemote
           local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
           write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)
         end
-        update_without_callbacks if changed?
       end
     end
     
@@ -157,7 +156,7 @@ module HasRemote
       # NOTE ARes#exists? is broken:
       # https://rails.lighthouseapp.com/projects/8994/tickets/1223-activeresource-head-request-sends-headers-with-a-nil-key
       #
-      return !remote(true).nil? rescue false   
+      return !remote(true).nil? rescue false
     end
   end
   
