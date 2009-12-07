@@ -97,7 +97,8 @@ module HasRemote
         local_attr = remote_attribute_aliases[remote_attr] || remote_attr
         record.send :write_attribute, local_attr, resource.send(remote_attr) 
       end
-      if record.send(:update_without_callbacks)
+      record.skip_update_cache = true # Dont update cache again on save:
+      if record.save!
         @update_count += 1
         logger.info( " - Updated #{name.downcase} with id #{record.id}.\n" )
       end
