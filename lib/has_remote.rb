@@ -111,8 +111,8 @@ module HasRemote
       # After save callback in order to update cached attributes will be omitted when set to true
       attr_accessor :skip_update_cache
       
-      # make sure remote attributes are synced after every save
-      before_save :update_cached_attributes!, :unless => :skip_update_cache
+      # make sure remote attributes are synced before every save
+      before_save :update_cached_attributes, :unless => :skip_update_cache
       
       include InstanceMethods
       HasRemote.models << self
@@ -136,20 +136,6 @@ module HasRemote
       @remote
     end
     
-    # Synchronizes all locally cached remote attributes.
-    #
-    # Note that when the remote does no longer exist, all remote attributes will be
-    # set to nil.
-    #
-    def update_cached_attributes!
-      unless self.class.cached_attributes.empty?
-        self.class.cached_attributes.each do |remote_attr|
-          local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
-          write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)
-        end
-      end
-    end
-    
     # Checks whether a remote proxy exists.
     #
     def has_remote?
@@ -158,6 +144,30 @@ module HasRemote
       #
       return !remote(true).nil? rescue false
     end
+    
+    # Synchronizes all locally cached remote attributes to this object and saves the object.
+    #
+    def update_cached_attributes!
+      update_cached_attributes
+      save!
+    end
+    
+    private
+    
+    # Synchronizes all locally cached remote attributes to this object, but does not save the object.
+    #
+    # Note that when the remote does no longer exist, all remote attributes will be
+    # set to nil.
+    #
+    def update_cached_attributes
+      unless self.class.cached_attributes.empty?
+        self.class.cached_attributes.each do |remote_attr|
+          local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
+          write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)
+        end
+      end
+    end
+    
   end
   
   class Config
