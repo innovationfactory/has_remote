@@ -85,7 +85,7 @@ You may need to override the changed_remotes_since class method in your model to
 
 ==== Manual synchronization
 
-See HasRemote::Caching for more information on the available methods for triggering synchronization manually.
+See HasRemote::Synchronizable for more information on the available methods for triggering synchronization manually.
 
 ==== Rake hr:sync
 

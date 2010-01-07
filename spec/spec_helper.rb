@@ -11,7 +11,7 @@ include Shoulda::ActiveRecord::Matchers
 
 # Include plugin's files
 require File.dirname(__FILE__) + '/../lib/has_remote'
-require File.dirname(__FILE__) + '/../lib/has_remote/caching'
+require File.dirname(__FILE__) + '/../lib/has_remote/synchronizable'
 require File.dirname(__FILE__) + '/../lib/has_remote/synchronization'
 
 # Initialize plugin

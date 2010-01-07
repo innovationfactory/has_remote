@@ -15,11 +15,11 @@ module HasRemote
     @models ||= []
   end
   
-  # Updates cached attributes of all models that have a remote.
-  # Also see HasRemote::Cache
+  # Updates cached attributes, destroys deleted records and adds new records of all models that have a remote.
+  # Also see HasRemote::Synchronizable
   #
-  def self.update_cached_attributes!
-    models.each(&:update_cached_attributes!)
+  def self.synchornize!
+    models.each(&:synchronize!)
   end
       
   module ClassMethods
@@ -93,7 +93,7 @@ module HasRemote
           @remote_attribute_aliases ||= {}
         end
         
-        include HasRemote::Caching
+        include HasRemote::Synchronizable
       end
       
       # set ARes to look for correct resource (only if not manually specified)

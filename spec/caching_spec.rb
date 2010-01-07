@@ -30,8 +30,8 @@ context "Given existing remote resources" do
         times << i.days.ago
         HasRemote::Synchronization.create(:model_name => 'HasRemoteSpec::User', :latest_change => times.last)
       end
-      User.should respond_to(:cache_updated_at)
-      User.cache_updated_at.to_s.should == times.first.to_s
+      User.should respond_to(:synchronized_at)
+      User.synchronized_at.to_s.should == times.first.to_s
     end
   
     it "should update its remote attributes when saved" do
@@ -68,23 +68,37 @@ context "Given existing remote resources" do
   
     describe "for the User model" do
     
-      it "should update all users" do
-        user_1, user_2 = User.create!(:remote_id => 1), User.create!(:remote_id => 2)
+      describe "with updated and deleted remotes" do
         
-        yesterday = DateTime.parse 1.day.ago.to_s
+        before(:each) do
+          @user_1, @user_2, @user_3 = User.create!(:remote_id => 1), User.create!(:remote_id => 2), User.create!(:remote_id => 3)
         
-        resources = [
-          mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => yesterday),
-          mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago)
-        ]
-        User.stub!(:changed_remotes_since).and_return(resources)
+          @yesterday = DateTime.parse 1.day.ago.to_s
         
-        lambda { User.update_cached_attributes! }.should change(HasRemote::Synchronization, :count).by(1)
-
-        user_1.reload[:email].should == "changed@foo.bar"
-        user_2.reload[:email].should == "altered@foo.bar"
-
-        HasRemote::Synchronization.for("HasRemoteSpec::User").latest_change.should == yesterday
+          resources = [
+            mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => @yesterday),
+            mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago, :deleted_at => nil),
+            mock(:user, :id => 3, :email => "same@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
+          ]
+          User.stub!(:changed_remotes_since).and_return(resources)
+        
+          lambda { User.synchronize! }.should change(HasRemote::Synchronization, :count).by(1)
+        end
+        
+        it "should keep track of the last synchronization" do
+          HasRemote::Synchronization.for("HasRemoteSpec::User").latest_change.should == @yesterday
+        end
+    
+        it "should update changed users" do
+          @user_1.reload[:email].should == "changed@foo.bar"
+          @user_2.reload[:email].should == "altered@foo.bar"
+        end
+      
+        it "should destroy deleted users" do
+          User.exists?(@user_3).should be_false
+        end
+      
+        it "should create added users"
       end
       
       describe "that fails" do
@@ -105,7 +119,7 @@ context "Given existing remote resources" do
             
             resources.last.should_receive(:send).and_raise "All hell breaks loose" # Raise when attr is read from resource 2.
             
-            User.update_cached_attributes!
+            User.synchronize!
           }
         end
         
