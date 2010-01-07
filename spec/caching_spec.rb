@@ -79,6 +79,7 @@ context "Given existing remote resources" do
             mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => @yesterday),
             mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago, :deleted_at => nil),
             mock(:user, :id => 3, :email => "same@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
+            mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday)
           ]
           User.stub!(:changed_remotes_since).and_return(resources)
         
@@ -98,7 +99,9 @@ context "Given existing remote resources" do
           User.exists?(@user_3).should be_false
         end
       
-        it "should create added users"
+        it "should create added users" do
+          User.exists?(:remote_id => 4).should be_true
+        end
       end
       
       describe "that fails" do
@@ -149,6 +152,27 @@ context "Given existing remote resources" do
     
     end
   
+  end
+  
+  describe "synchronizing new cheeses" do
+    before do
+      resources = [
+        mock(:cheese, :id => 1, :name => "Brie", :updated_at => Date.yesterday)
+      ]
+      Cheese.stub!(:changed_remotes_since).and_return(resources)
+      lambda{ Cheese.synchronize! }.should change(Cheese, :count).from(0).to(1)
+    end
+    
+    after { Cheese.delete_all }
+        
+    it "should populate the local 'maturity' attribute with its default database value" do
+      Cheese.first.maturity.should == 5
+    end
+    
+    it "should populate the local 'smell' attribute with the value set inside of a before_validation callback" do
+      Cheese.first.smell.should == 5 * 10 
+    end
+    
   end
   
 end

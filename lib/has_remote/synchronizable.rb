@@ -86,10 +86,10 @@ module HasRemote
     
     def sync_all_records_for_resource(resource) #:nodoc:
       records = find(:all, :conditions => ["#{remote_foreign_key} = ?", resource.send(remote_primary_key)])
-      unless records.empty?
-        records.each { |record| sync_record_for_resource(record, resource) }
+      if records.empty?
+        create_record_for_resource(resource)
       else
-        logger.info( " - No local #{name.downcase} has remote with id #{resource.send(remote_primary_key)}.\n" )
+        records.each { |record| sync_record_for_resource(record, resource) }
       end
     end
     
@@ -97,11 +97,12 @@ module HasRemote
       if resource.respond_to?(:deleted_at) && resource.deleted_at && resource.deleted_at <= Time.now
         delete_record_for_resource(record, resource)
       else
-        update_record_for_resource(record, resource)
+        update_and_save_record_for_resource(record, resource)
       end
     end
     
-    def update_record_for_resource(record, resource) #:nodoc:
+    def update_and_save_record_for_resource(record, resource) #:nodoc:
+      was_it_new = record.new_record?
       cached_attributes.each do |remote_attr|
         local_attr = remote_attribute_aliases[remote_attr] || remote_attr
         record.send :write_attribute, local_attr, resource.send(remote_attr)
@@ -109,13 +110,17 @@ module HasRemote
       record.skip_update_cache = true # Dont update cache again on save:
       if record.save!
         @update_count += 1
-        logger.info( " - Updated #{name.downcase} with id #{record.id}.\n" )
+        logger.info( was_it_new ? " - Created #{name.downcase} with id #{record.id}.\n" : " - Updated #{name.downcase} with id #{record.id}.\n" )
       end
     end
     
-    def delete_record_for_resource(record, resource)
+    def delete_record_for_resource(record, resource) #:nodoc:
       record.destroy
       logger.info( " - Deleted #{name.downcase} with id #{record.id}.\n" )
+    end
+    
+    def create_record_for_resource(resource) #:nodoc:
+      update_and_save_record_for_resource(new(remote_foreign_key => resource.send(remote_primary_key)), resource)
     end
 
   end  
