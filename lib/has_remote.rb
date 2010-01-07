@@ -16,7 +16,7 @@ module HasRemote
   end
   
   # Updates cached attributes, destroys deleted records and adds new records of all models that have a remote.
-  # Also see HasRemote::Synchronizable
+  # Also see HasRemote::Synchronizable.
   #
   def self.synchornize!
     models.each(&:synchronize!)
@@ -31,7 +31,6 @@ module HasRemote
     # 
     # [:foreign_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
     # [:remote_primary_key]  The name of the remote resource's primary key. Defaults to :id.
-    #
     # [:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
     #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html      
     # [:through]     Optional custom ActiveResource class name to use for the proxy. If not set, a default class called

@@ -13,8 +13,13 @@ module HasRemote
   # You can also update a single record:
   #  @user.update_cached_attributes!
   #
-  # You could make your application call these methods whenever you need to be sure
-  # your cache is up to date.
+  # You can make your application call these methods whenever you need to be sure
+  # your cache is up to date or use the 'hr:sync' rake task to synchronize all models
+  # from the command line.
+  #
+  # *Note* 
+  # All remote resources need to have an 'updated_at' field in order for synchronization to work. Records will 
+  # be destroyed if their remote resource's 'deleted_at' time lies before the time of synchronization.
   #
   module Synchronizable
 
@@ -25,7 +30,7 @@ module HasRemote
     end
     
     # Returns all remote objects that have been changed since the given time or one week ago if no
-    # time is given.
+    # time is given. This may include new and optionally deleted (tagged by a 'deleted_at' attribute) resources.
     #
     # This is used by the <tt>synchronize!</tt> class method. By default
     # it queries '/updated?since=<time>' on your resources URL, where 'time' is
@@ -44,7 +49,7 @@ module HasRemote
       remote_class.find :all, :from => :updated, :params => {:since => time.to_s}  
     end
     
-    # Will update all records that have been updated or deleted on the remote host
+    # Will update all records that have been created, updated or deleted on the remote host
     # since the last successful synchronization.
     #
     def synchronize!

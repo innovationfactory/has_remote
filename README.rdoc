@@ -7,7 +7,7 @@ which enables you to look for certain attributes remotely using a RESTful webser
 
  script/plugins install git://github.com/innovationfactory/has_remote.git
 
-Only if you require locally cached attributes and synchronization of those:
+Only if you require synchronization:
 
  script/generate has_remote_migration
 
@@ -80,7 +80,7 @@ ways of keeping the locally cached attributes in sync with their remote values.
 1. Manual synchronization
 2. Rake task hr:sync
 
-Synchronization automatically requests all remote resources that have been changed since the last successful synchronization.
+Synchronization automatically requests all remote resources that have been changed (including new and deleted records) since the last successful synchronization.
 You may need to override the changed_remotes_since class method in your model to match your host's REST API.
 
 ==== Manual synchronization
