@@ -52,11 +52,11 @@ module HasRemote
     # Will update all records that have been created, updated or deleted on the remote host
     # since the last successful synchronization.
     #
-    def synchronize!
+    def synchronize!(options = {})
       logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
       @update_count = 0
       begin
-        changed_objects = changed_remotes_since( synchronized_at )
+        changed_objects = changed_remotes_since( options[:since] || synchronized_at )
         if changed_objects.any?
           # Do everything within transaction to prevent ending up in half-synchronized situation if an exception is raised.
           transaction { sync_all_records_for(changed_objects) }
