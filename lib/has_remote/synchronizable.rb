@@ -66,7 +66,7 @@ module HasRemote
       rescue => e
         logger.warn( " - Synchronization of #{table_name} failed: #{e} \n #{e.backtrace}" )
       else
-        self.synchronized_at = changed_objects.map(&:updated_at).sort.last if changed_objects.any?  
+        self.synchronized_at = changed_objects.map { |o| time_of_update(o) }.sort.last if changed_objects.any?  
         logger.info( " - Updated #{@update_count} #{table_name}.\n" ) if @update_count > 0
       ensure
         logger.info( "*** Stopped synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
@@ -126,6 +126,10 @@ module HasRemote
     
     def create_record_for_resource(resource) #:nodoc:
       update_and_save_record_for_resource(new(remote_foreign_key => resource.send(remote_primary_key)), resource)
+    end
+    
+    def time_of_update(resource)
+      resource.respond_to?(:deleted_at) ? resource.deleted_at : resource.updated_at
     end
 
   end  
