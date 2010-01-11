@@ -91,8 +91,8 @@ module HasRemote
     
     def sync_all_records_for_resource(resource) #:nodoc:
       records = find(:all, :conditions => ["#{remote_foreign_key} = ?", resource.send(remote_primary_key)])
-      if records.empty? && !deleted?(resource)
-        create_record_for_resource(resource)
+      if records.empty?
+        create_record_for_resource(resource) unless deleted?(resource)
       else
         records.each { |record| sync_record_for_resource(record, resource) }
       end
