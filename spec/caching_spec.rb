@@ -78,8 +78,9 @@ context "Given existing remote resources" do
           resources = [
             mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => @yesterday),
             mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago, :deleted_at => nil),
-            mock(:user, :id => 3, :email => "same@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
-            mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday)
+            mock(:user, :id => 3, :email => "deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
+            mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday),
+            mock(:user, :id => 5, :email => "new-deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
           ]
           User.stub!(:changed_remotes_since).and_return(resources)
         
@@ -101,6 +102,10 @@ context "Given existing remote resources" do
       
         it "should create added users" do
           User.exists?(:remote_id => 4).should be_true
+        end
+        
+        it "should not create deleted users" do
+          User.exists?(:remote_id => 5).should be_false
         end
       end
       

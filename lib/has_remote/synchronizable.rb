@@ -91,7 +91,7 @@ module HasRemote
     
     def sync_all_records_for_resource(resource) #:nodoc:
       records = find(:all, :conditions => ["#{remote_foreign_key} = ?", resource.send(remote_primary_key)])
-      if records.empty?
+      if records.empty? && !deleted?(resource)
         create_record_for_resource(resource)
       else
         records.each { |record| sync_record_for_resource(record, resource) }
@@ -99,7 +99,7 @@ module HasRemote
     end
     
     def sync_record_for_resource(record, resource) #:nodoc:
-      if resource.respond_to?(:deleted_at) && resource.deleted_at && resource.deleted_at <= Time.now
+      if deleted?(resource)
         delete_record_for_resource(record, resource)
       else
         update_and_save_record_for_resource(record, resource)
@@ -130,6 +130,10 @@ module HasRemote
     
     def time_of_update(resource)
       (resource.respond_to?(:deleted_at) && resource.deleted_at) ? resource.deleted_at : resource.updated_at
+    end
+    
+    def deleted?(resource)
+      resource.respond_to?(:deleted_at) && resource.deleted_at && resource.deleted_at <= Time.now
     end
 
   end  
