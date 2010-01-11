@@ -54,7 +54,7 @@ module HasRemote
     #
     def synchronize!(options = {})
       logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
-      @update_count = 0
+      @sync_count = 0
       begin
         changed_objects = changed_remotes_since( options[:since] || synchronized_at )
         if changed_objects.any?
@@ -67,7 +67,7 @@ module HasRemote
         logger.warn( " - Synchronization of #{table_name} failed: #{e} \n #{e.backtrace}" )
       else
         self.synchronized_at = changed_objects.map { |o| time_of_update(o) }.sort.last if changed_objects.any?  
-        logger.info( " - Updated #{@update_count} #{table_name}.\n" ) if @update_count > 0
+        logger.info( " - Synchronized #{@sync_count} #{table_name}.\n" ) if @sync_count > 0
       ensure
         logger.info( "*** Stopped synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
       end
@@ -114,13 +114,14 @@ module HasRemote
       end
       record.skip_update_cache = true # Dont update cache again on save:
       if record.save!
-        @update_count += 1
+        @sync_count += 1
         logger.info( was_it_new ? " - Created #{name.downcase} with id #{record.id}.\n" : " - Updated #{name.downcase} with id #{record.id}.\n" )
       end
     end
     
     def delete_record_for_resource(record, resource) #:nodoc:
       record.destroy
+      @sync_count += 1
       logger.info( " - Deleted #{name.downcase} with id #{record.id}.\n" )
     end
     
