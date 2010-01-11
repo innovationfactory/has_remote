@@ -129,7 +129,7 @@ module HasRemote
     end
     
     def time_of_update(resource)
-      resource.respond_to?(:deleted_at) ? resource.deleted_at : resource.updated_at
+      (resource.respond_to?(:deleted_at) && resource.deleted_at) ? resource.deleted_at : resource.updated_at
     end
 
   end  
