@@ -5,5 +5,7 @@ module HasRemoteSpec
       remote.attribute :email, :local_cache => true
       remote.attribute :phone, :as => :telephone
     end
+    
+    before_save :update_cached_attributes
   end
 end

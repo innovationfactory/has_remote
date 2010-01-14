@@ -105,6 +105,8 @@ module HasRemote
         @remote_class.send "#{option}=", value 
       end
       
+      attr_accessor :skip_update_cache
+      
       block.call( Config.new(self) ) if block_given?
             
       include InstanceMethods
@@ -153,7 +155,7 @@ module HasRemote
     # set to nil.
     #
     def update_cached_attributes
-      unless self.class.cached_attributes.empty?
+      unless self.skip_update_cache || self.class.cached_attributes.empty?
         self.class.cached_attributes.each do |remote_attr|
           local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
           write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)

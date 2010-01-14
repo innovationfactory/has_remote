@@ -33,35 +33,25 @@ context "Given existing remote resources" do
       User.should respond_to(:synchronized_at)
       User.synchronized_at.to_s.should == times.first.to_s
     end
-  
-    it "should update its remote attributes when saved" do
-      user = User.new :remote_id => 1
-      user[:email].should be_nil
-   
-      user.save!
-      user[:email].should == "joeremote@foo.bar"
-    end
-    
-    it "should not update its remote attributes if 'skip_update_cache' is true" do
-      user = User.new :remote_id => 1, :skip_update_cache => true
-      user[:email].should be_nil
-   
-      user.save!
-      user[:email].should be_nil
-    end
-
-    it "should update its remote attributes when created and updated" do
-      user = User.create! :remote_id => 1
-      user[:email].should == "joeremote@foo.bar"
-      user.update_attributes(:remote_id => 2)
-      user[:email].should == "jane_remote@foo.bar"   
-    end
-    
+        
     it "should not delegate cached remote attributes" do
       user = User.create! :remote_id => 1
       User::Remote.should_not_receive(:find)
       user.email.should == "joeremote@foo.bar"
     end
+    
+    it "should update its cached remote attributes on save" do
+      user = User.create! :remote_id => 1
+      user[:email].should == "joeremote@foo.bar"
+      user.update_attributes(:remote_id => 2)
+      user[:email].should == "jane_remote@foo.bar"   
+    end
+
+    it "should not update its cached remote attributes if skip_update_cache is true" do
+      user = User.create! :remote_id => 1, :skip_update_cache => true
+      user[:email].should == nil
+    end
+    
   end
 
   describe "synchronization" do
@@ -78,8 +68,9 @@ context "Given existing remote resources" do
           resources = [
             mock(:user, :id => 1, :email => "changed@foo.bar", :updated_at => @yesterday),
             mock(:user, :id => 2, :email => "altered@foo.bar", :updated_at => 2.days.ago, :deleted_at => nil),
-            mock(:user, :id => 3, :email => "same@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
-            mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday)
+            mock(:user, :id => 3, :email => "deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
+            mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday),
+            mock(:user, :id => 5, :email => "new-deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
           ]
           User.stub!(:changed_remotes_since).and_return(resources)
         
@@ -101,6 +92,10 @@ context "Given existing remote resources" do
       
         it "should create added users" do
           User.exists?(:remote_id => 4).should be_true
+        end
+        
+        it "should not create deleted users" do
+          User.exists?(:remote_id => 5).should be_false
         end
       end
       
