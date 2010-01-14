@@ -10,7 +10,10 @@ module HasRemote
   # For users only:
   #  User.synchronize!
   #
-  # You can also update a single record:
+  # You can also update a single record's cached attributes:
+  #  @user.update_cached_attributes
+  #
+  # Or with also saving the record:
   #  @user.update_cached_attributes!
   #
   # You can make your application call these methods whenever you need to be sure

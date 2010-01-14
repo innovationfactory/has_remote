@@ -106,13 +106,7 @@ module HasRemote
       end
       
       block.call( Config.new(self) ) if block_given?
-      
-      # After save callback in order to update cached attributes will be omitted when set to true
-      attr_accessor :skip_update_cache
-      
-      # make sure remote attributes are synced before every save
-      before_save :update_cached_attributes, :unless => :skip_update_cache
-      
+            
       include InstanceMethods
       HasRemote.models << self
     end
