@@ -117,7 +117,8 @@ module HasRemote
   
   module InstanceMethods
     
-    # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. 
+    # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. Returns nil
+    # if foreign key is nil. 
     #
     # *Arguments*
     #
@@ -126,7 +127,7 @@ module HasRemote
     def remote(force_reload = false)
       if force_reload || @remote.nil?
         id = self.send(self.class.remote_foreign_key)
-        @remote = (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) rescue nil
+        @remote = id ? (self.class.remote_finder ? self.class.remote_finder[id] : self.class.remote_class.find(id)) : nil
       end
       @remote
     end
@@ -197,7 +198,7 @@ module HasRemote
         @base.class_eval <<-RB
 
           def #{method_name}
-            remote.nil? ? nil : remote.send(:#{attr_name})
+            remote.try(:#{attr_name})
           end
 
           def #{method_name}=(arg)

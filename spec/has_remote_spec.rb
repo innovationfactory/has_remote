@@ -53,12 +53,6 @@ describe User do
       @user.name.should == "John"
     end
 
-    it "should not have a remote" do
-      User::Remote.should_receive(:find).twice.with(1).and_raise "not found"
-      @user.remote.should be_nil
-      @user.has_remote?.should be_false
-    end
-
     context "without a remote" do
       
       before(:each) do
