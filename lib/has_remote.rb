@@ -148,8 +148,6 @@ module HasRemote
       save!
     end
     
-    private
-    
     # Synchronizes all locally cached remote attributes to this object, but does not save the object.
     #
     # Note that when the remote does no longer exist, all remote attributes will be
