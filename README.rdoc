@@ -17,7 +17,7 @@ Only if you require synchronization:
 
 First make sure your records have a reference to a remote resource:
   add_column :users, :remote_id, :integer
-	
+
 The default key is 'remote_id', but this can be changed, see options for has_remote.
 
  class User < ActiveRecord::Base
@@ -29,7 +29,7 @@ The default key is 'remote_id', but this can be changed, see options for has_rem
 
  @user.remote
  # => #<User::Remote:...>
- 
+
  @user.remote.username
  # => "User name from remote server"
 
@@ -38,7 +38,7 @@ has_remote optionally takes a block which can be used to specify remote attribut
  class User < ActiveRecord::Base
    has_remote :site => '...' do |remote|
      remote.attribute :username
-   end 
+   end
  end
 
  @user.username
@@ -61,7 +61,7 @@ See documentation for has_remote for a description of all options.
 
 === Caching attributes locally
 
-In case you need to do database operations on remote attributes, like sorting, you can tell has_remote
+In case certain attributes are used a lot and performance is getting bad, or in case you need to do database operations on remote attributes, like sorting, you can tell has_remote
 to locally cache specific attributes in the following manner:
 
  class User < ActiveRecord::Base
@@ -72,28 +72,41 @@ to locally cache specific attributes in the following manner:
  end
 
 This assumes you also have a 'username' and 'email' column in the local 'users' table. Note that when using the
-:as option the local column is assumed to be named after this value.
+<tt>:as</tt> option the local column is assumed to be named after this value.
 
-Cached attributes will be updated every time the record is saved. Also there are two other
-ways of keeping the locally cached attributes in sync with their remote values.
+=== Synchronization of cached attributes
 
-1. Manual synchronization
-2. Rake task hr:sync
+There are two ways of keeping the locally cached attributes in sync with their remote values.
 
-Synchronization automatically requests all remote resources that have been changed (including new and deleted records) since the last successful synchronization.
-You may need to override the changed_remotes_since class method in your model to match your host's REST API.
+1. Inline synchronization
+2. Rake task <tt>hr:sync</tt>
 
-==== Manual synchronization
+==== Inline synchronization
 
-See HasRemote::Synchronizable for more information on the available methods for triggering synchronization manually.
+Synchronize a single record's attributes:
+ @user.update_cached_attributes
+
+*Tip!* It is often useful to trigger this method by means of a callback in order to initialize remote attributes when the record is created:
+ before_create :update_cached_attributes
+
+Appending an exclamation mark will also save the record:
+ @user.update_cached_attributes!
+
+Synchronize all records of one specific model:
+ User.synchronize!
+
+The latter automatically requests all remote resources that have been changed (including new and deleted records) since the last successful synchronization for this particular model.
+You may need to override the <tt>changed_remotes_since</tt> class method in your model to match your host's REST API.
+
+See <tt>HasRemote::Synchronizable</tt> for more information.
 
 ==== Rake hr:sync
 
-The rake task 'hr:sync' is provided to allow easy synchronization from the command line.
+The rake task <tt>hr:sync</tt> is provided to allow easy synchronization from the command line.
 You could set up a cron tab that runs this task regularly to keep the data in sync.
 
-By default hr:sync updates all records of each model that has remotes. You can limit this to
-certain models by using the MODELS variable:
+By default <tt>hr:sync</tt> updates all records of each model that has remotes. You can limit this to
+certain models by using the <tt>MODELS</tt> variable:
 
  rake hr:sync MODELS=Contact,Company
 
@@ -102,7 +115,7 @@ certain models by using the MODELS variable:
 To generate RDocs for this plugin, from the has_remote directory run:
  rake rdoc
 or from your application's root directory, run:
- rake doc:plugins:has_remote 
+ rake doc:plugins:has_remote
 
 === Testing
 
@@ -114,7 +127,7 @@ To run the specs of the plugin, from the has_remote directory run:
 === More information & patches
 
 - Simple example of how HasRemote simplifies your code: http://gist.github.com/176335
-- Simple API authentication with HasRemote: http://gist.github.com/174497 
+- Simple API authentication with HasRemote: http://gist.github.com/174497
 
 Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]nl.
 
