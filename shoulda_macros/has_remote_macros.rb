@@ -1,13 +1,12 @@
 module HasRemoteMacros
-  
+
   def should_have_remote(&block)
     klass = model_class
     should "have remote resources" do
       assert HasRemote.models.include?(klass)
-      assert klass.const_defined?("Remote")
     end
   end
-  
+
   def should_have_remote_attribute(attr_name, options = {})
     klass = model_class
     should "have remote attribute #{attr_name}" do
@@ -16,7 +15,7 @@ module HasRemoteMacros
       assert klass.new.respond_to?(options[:as] || attr_name)
     end
   end
-  
+
 end
 
 Test::Unit::TestCase.extend HasRemoteMacros
