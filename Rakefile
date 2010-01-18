@@ -29,6 +29,7 @@ begin
     gemspec.homepage    = "http://github.com/innovationfactory/has_remote"
     gemspec.authors     = ["Sjoerd Andringa"]
   end
+  Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
 end
