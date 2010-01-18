@@ -5,9 +5,15 @@ which enables you to look for certain attributes remotely using a RESTful webser
 
 === Installation
 
+As a gem; Add the following to <tt>config/environment.rb</tt>:
+
+ config.gem 'HasRemote', :lib => 'has_remote', :version => ">= 0.1.1"
+
+As a plugin; Run:
+
  script/plugins install git://github.com/innovationfactory/has_remote.git
 
-Only if you require synchronization:
+And only if you require synchronization, run:
 
  script/generate has_remote_migration
 
