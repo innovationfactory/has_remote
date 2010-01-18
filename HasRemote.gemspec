@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".gitignore",
+     "HasRemote.gemspec",
      "MIT-LICENSE",
      "README.rdoc",
      "Rakefile",
