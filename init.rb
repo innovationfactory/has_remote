@@ -1,1 +1,1 @@
-ActiveRecord::Base.send(:include, HasRemote)
+require File.dirname(__FILE__) + "/rails/init"
