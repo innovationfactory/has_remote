@@ -11,7 +11,7 @@ As a gem; Add the following to <tt>config/environment.rb</tt>:
 
 As a plugin; Run:
 
- script/plugins install git://github.com/innovationfactory/has_remote.git
+ script/plugin install git://github.com/innovationfactory/has_remote.git
 
 And only if you require synchronization, run:
 
