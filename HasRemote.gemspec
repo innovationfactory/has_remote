@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
      "lib/has_remote.rb",
      "lib/has_remote/synchronizable.rb",
      "lib/has_remote/synchronization.rb",
-     "lib/tasks/has_remote.rake",
+     "lib/has_remote/tasks.rb",
      "rails/init.rb",
      "shoulda_macros/has_remote_macros.rb",
      "spec/caching_spec.rb",
@@ -42,7 +42,8 @@ Gem::Specification.new do |s|
      "spec/has_remote_spec/user.rb",
      "spec/schema.rb",
      "spec/spec_helper.rb",
-     "spec/synchronization_spec.rb"
+     "spec/synchronization_spec.rb",
+     "tasks/rails.rake"
   ]
   s.homepage = %q{http://github.com/innovationfactory/has_remote}
   s.rdoc_options = ["--charset=UTF-8"]
