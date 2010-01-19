@@ -9,6 +9,10 @@ As a gem; Add the following to <tt>config/environment.rb</tt>:
 
  config.gem 'HasRemote', :lib => 'has_remote', :version => ">= 0.1.1"
 
+Require the rake tasks from your application's <tt>Rakefile</tt> (only if installed as a gem):
+
+ require 'has_remote/tasks'
+
 As a plugin; Run:
 
  script/plugin install git://github.com/innovationfactory/has_remote.git
