@@ -120,6 +120,10 @@ certain models by using the <tt>MODELS</tt> variable:
 
  rake hr:sync MODELS=Contact,Company
 
+To specify additional parameters to send with the request that fetches updated resources use the PARAMS variable:
+
+ rake hr:sync PARAMS="since=01-01-2010&limit=25"
+
 === Documentation
 
 To generate RDocs for this plugin, from the has_remote directory run:
