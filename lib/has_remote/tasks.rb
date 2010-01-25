@@ -3,10 +3,7 @@ namespace :hr do
   desc 'Synchronizes all attributes locally cached by has_remote'
   task :sync => :environment do
     models = ENV['MODELS'].nil? ? HasRemote.models : extract_models
-    options = {}
-    options[:limit] = ENV['LIMIT'] if ENV['LIMIT']
-    options[:since] = ENV['SINCE'] if ENV['SINCE']
-
+    options = ENV['PARAMS'] ? Rack::Utils.parse_query(ENV['PARAMS']) : {}
     models.each{|model| model.synchronize!(options)}
   end
 
