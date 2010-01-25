@@ -47,8 +47,10 @@ module HasRemote
     #    User::Remote.find :all, :from => :search, :params => {:updated_since => time.strftime('...') }
     #  end
     #
-    # @param [DateTime] time The given time that defines since (see above)
-    # @param [Hash] params Additional params to send with the request (i.e. :limit)
+    # *Arguments*
+    #
+    # [<tt>time</tt>:] The given time that defines since (see above)
+    # [<tt>params</tt>:] Optional hash of additional parameters to send with the request (e.g. {:limit =>  5})
     #
     def changed_remotes_since(time = nil, params = {})
       time ||= 1.week.ago
@@ -57,6 +59,12 @@ module HasRemote
 
     # Will update all records that have been created, updated or deleted on the remote host
     # since the last successful synchronization.
+    #
+    # *Options*
+    #
+    # [<tt>since</tt>:] Optionally override the time as of which updated resources are fetched. Also see <tt>changes_remotes_since</tt>.
+    #
+    # All other options are passed in as parameters to <tt>changes_remotes_since</tt>.
     #
     def synchronize!(options = {})
       logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
