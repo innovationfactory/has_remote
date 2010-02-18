@@ -28,7 +28,7 @@ And only if you require synchronization, run:
 First make sure your records have a reference to a remote resource:
   add_column :users, :remote_id, :integer
 
-The default key is 'remote_id', but this can be changed, see options for has_remote.
+The default key is 'remote_id', but this can be changed, see options for <tt>has_remote</tt>.
 
  class User < ActiveRecord::Base
    has_remote :site => 'http://people.local'
