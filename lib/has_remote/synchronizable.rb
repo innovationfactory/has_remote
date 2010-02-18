@@ -36,25 +36,25 @@ module HasRemote
     # time is given. This may include new and optionally deleted (tagged by a 'deleted_at' attribute) resources.
     #
     # This is used by the <tt>synchronize!</tt> class method. By default
-    # it queries '/updated?since=<time>' on your resources URL, where 'time' is
-    # the latest updated_at time of the last processed remote objects.
+    # it queries '/updated?since=<time>&last_record_id=<id>' on your resources URL, where 'time' is
+    # the updated_at value of the last processed remote object and 'last_record_id' is its id.
+    #
+    # *Options*
+    #
+    # The options passed in to <tt>synchronize!</tt> will be passed through to <tt>updated_remotes</tt>.
+    # By default they are used as request parameters for remotely requesting the updated records.
     #
     # You may need to override this method in your model to match your host's REST API or to change
     # the default time, e.g.:
     #
-    #  def self.changed_remotes_since(time = nil)
-    #    time ||= 12.hours.ago
-    #    User::Remote.find :all, :from => :search, :params => {:updated_since => time.strftime('...') }
+    #  def self.updated_remotes(options = nil)
+    #    time = last_synchronization.try(:last_record_updated_at) || 12.hours.ago
+    #    User::Remote.find :all, :from => :search, :params => { :updated_since => time.to_s(:db) }
     #  end
     #
-    # *Arguments*
-    #
-    # [<tt>time</tt>:] The given time that defines since (see above)
-    # [<tt>params</tt>:] Optional hash of additional parameters to send with the request (e.g. {:limit =>  5})
-    #
-    def changed_remotes_since(time = nil, params = {})
-      time ||= 1.week.ago
-      remote_class.find :all, :from => :updated, :params => {:since => time.to_s}.merge(params)
+    def updated_remotes( options = {} )
+      time = last_synchronization.try(:last_record_updated_at) || 1.week.ago
+      remote_class.find :all, :from => :updated, :params => { :since => time.to_s, :last_record_id => last_synchronization.try(:last_record_id) }.merge( options )
     end
 
     # Will update all records that have been created, updated or deleted on the remote host
@@ -62,15 +62,14 @@ module HasRemote
     #
     # *Options*
     #
-    # [<tt>since</tt>:] Optionally override the time as of which updated resources are fetched. Also see <tt>changes_remotes_since</tt>.
-    #
-    # All other options are passed in as parameters to <tt>changes_remotes_since</tt>.
+    # Options are passed through to <tt>updated_remotes</tt> which is called in order to fetch the updated records.
+    # Use this if you want to override its default options.
     #
     def synchronize!(options = {})
       logger.info( "*** Start synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
       @sync_count = 0
       begin
-        changed_objects = changed_remotes_since( options.delete(:since) || synchronized_at, options )
+        changed_objects = updated_remotes( options )
         if changed_objects.any?
           # Do everything within transaction to prevent ending up in half-synchronized situation if an exception is raised.
           transaction { sync_all_records_for(changed_objects) }
@@ -80,24 +79,24 @@ module HasRemote
       rescue => e
         logger.warn( " - Synchronization of #{table_name} failed: #{e} \n #{e.backtrace}" )
       else
-        self.synchronized_at = changed_objects.map { |o| time_of_update(o) }.sort.last if changed_objects.any?
+        if changed_objects.any?
+          last_record_updated_at = time_updated(changed_objects.last)
+          last_record_id = changed_objects.last.send(remote_primary_key)
+          HasRemote::Synchronization.create!(:model_name => self.name, :last_record_updated_at => last_record_updated_at, :last_record_id => last_record_id)
+        end
         logger.info( " - Synchronized #{@sync_count} #{table_name}.\n" ) if @sync_count > 0
       ensure
         logger.info( "*** Stopped synchronizing #{table_name} at #{Time.now.to_s :long} ***\n" )
       end
     end
 
-    # Time of the last successful synchronization.
+    # The last successful synchronization for this model.
     #
-    def synchronized_at
-      HasRemote::Synchronization.for(self.name).latest_change
+    def last_synchronization
+      HasRemote::Synchronization.for(self.name).last
     end
 
   private
-
-    def synchronized_at=(time) #:nodoc:
-      HasRemote::Synchronization.create!(:model_name => self.name, :latest_change => time)
-    end
 
     def sync_all_records_for(resources) #:nodoc:
       resources.each { |resource| sync_all_records_for_resource(resource) }
@@ -143,7 +142,7 @@ module HasRemote
       update_and_save_record_for_resource(new(remote_foreign_key => resource.send(remote_primary_key)), resource)
     end
 
-    def time_of_update(resource)
+    def time_updated(resource)
       (resource.respond_to?(:deleted_at) && resource.deleted_at) ? resource.deleted_at : resource.updated_at
     end
 

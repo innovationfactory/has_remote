@@ -106,7 +106,7 @@ Synchronize all records of one specific model:
  User.synchronize!
 
 The latter automatically requests all remote resources that have been changed (including new and deleted records) since the last successful synchronization for this particular model.
-You may need to override the <tt>changed_remotes_since</tt> class method in your model to match your host's REST API.
+You may need to override the <tt>updated_remotes</tt> class method in your model to match your host's REST API.
 
 See <tt>HasRemote::Synchronizable</tt> for more information.
 
