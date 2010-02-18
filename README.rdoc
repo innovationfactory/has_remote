@@ -146,4 +146,4 @@ To run the specs of the plugin, from the has_remote directory run:
 Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]nl.
 
 
-Copyright (c) 2009 Innovation Factory.
+Copyright (c) 2009-2010 Innovation Factory.
