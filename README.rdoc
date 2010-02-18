@@ -124,6 +124,9 @@ To specify additional parameters to send with the request that fetches updated r
 
  rake hr:sync PARAMS="since=01-01-2010&limit=25"
 
+(If you've overridden the <tt>updated_remotes</tt> class method on one of your synchronizable models, then note that these parameters are
+passed in as a hash to <tt>updated_remotes</tt> internally.)
+
 === Documentation
 
 To generate RDocs for this plugin, from the has_remote directory run:
