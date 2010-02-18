@@ -1,6 +1,6 @@
 = HasRemote
 
-Gives your local ActiveRecord model an ActiveResource equivalent,
+Binds your local ActiveRecord objects to a remote ActiveResource object,
 which enables you to look for certain attributes remotely using a RESTful webservice.
 
 === Installation
@@ -43,7 +43,7 @@ The default key is 'remote_id', but this can be changed, see options for <tt>has
  @user.remote.username
  # => "User name from remote server"
 
-has_remote optionally takes a block which can be used to specify remote attributes:
+<tt>has_remote</tt> optionally takes a block which can be used to specify remote attributes:
 
  class User < ActiveRecord::Base
    has_remote :site => '...' do |remote|
@@ -67,7 +67,7 @@ The <tt>:through</tt> option enables you to specify your own ActiveResource clas
    has_remote :through => "RemoteUser"
  end
 
-See documentation for has_remote for a description of all options.
+See documentation for <tt>has_remote</tt> for a description of all options.
 
 === Caching attributes locally
 
@@ -136,7 +136,7 @@ or from your application's root directory, run:
 
 === Testing
 
-To run the specs of the plugin, from the has_remote directory run:
+To run the specs of the plugin, from the HasRemote directory run:
  rake spec
 
 (This requires you to have both RSpec and Shoulda installed.)
