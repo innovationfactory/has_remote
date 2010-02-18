@@ -7,7 +7,7 @@ which enables you to look for certain attributes remotely using a RESTful webser
 
 As a gem; Add the following to <tt>config/environment.rb</tt>:
 
- config.gem 'HasRemote', :lib => 'has_remote', :version => ">= 0.1.1"
+ config.gem 'HasRemote', :lib => 'has_remote'
 
 Require the rake tasks from your application's <tt>Rakefile</tt> (only if installed as a gem):
 
