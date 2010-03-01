@@ -53,7 +53,7 @@ module HasRemote
     #  end
     #
     def updated_remotes( options = {} )
-      time = last_synchronization.try(:last_record_updated_at) || 1.week.ago
+      time = last_synchronization.try(:last_record_updated_at) || DateTime.parse("Jan 1 1970")
       remote_class.find :all, :from => :updated, :params => { :since => time.to_s, :last_record_id => last_synchronization.try(:last_record_id) }.merge( options )
     end
 
