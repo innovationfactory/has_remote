@@ -25,11 +25,11 @@ And only if you require synchronization, run:
  
 === Links
 
-RDoc: http://rdoc.info/projects/innovationfactory/has_remote
-Github: http://github.com/innovationfactory/has_remote
+[RDoc:] http://rdoc.info/projects/innovationfactory/has_remote
+[Github:] http://github.com/innovationfactory/has_remote
 
-Simple example of how HasRemote simplifies your code: http://gist.github.com/176335
-Simple API authentication with HasRemote: http://gist.github.com/174497
+[Simple example of how HasRemote simplifies your code:] http://gist.github.com/176335
+[Simple API authentication with HasRemote:] http://gist.github.com/174497
 
 === Examples
 
