@@ -22,6 +22,14 @@ And only if you require synchronization, run:
  script/generate has_remote_migration
 
  rake db:migrate
+ 
+=== Links
+
+RDoc: http://rdoc.info/projects/innovationfactory/has_remote
+Github: http://github.com/innovationfactory/has_remote
+
+Simple example of how HasRemote simplifies your code: http://gist.github.com/176335
+Simple API authentication with HasRemote: http://gist.github.com/174497
 
 === Examples
 
@@ -127,13 +135,6 @@ To specify additional parameters to send with the request that fetches updated r
 (If you've overridden the <tt>updated_remotes</tt> class method on one of your synchronizable models, then note that these parameters are
 passed in as a hash to <tt>updated_remotes</tt> internally.)
 
-=== Documentation
-
-To generate RDocs for this plugin, from the has_remote directory run:
- rake rdoc
-or from your application's root directory, run:
- rake doc:plugins:has_remote
-
 === Testing
 
 To run the specs of the plugin, from the HasRemote directory run:
@@ -143,10 +144,7 @@ To run the specs of the plugin, from the HasRemote directory run:
 
 === More information & patches
 
-- Simple example of how HasRemote simplifies your code: http://gist.github.com/176335
-- Simple API authentication with HasRemote: http://gist.github.com/174497
-
-Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]nl.
+Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]eu.
 
 
 Copyright (c) 2009-2010 Innovation Factory.
