@@ -18,7 +18,7 @@ module HasRemote
   # Updates cached attributes, destroys deleted records and adds new records of all models that have a remote.
   # Also see HasRemote::Synchronizable.
   #
-  def self.synchornize!
+  def self.synchronize!
     models.each(&:synchronize!)
   end
       
