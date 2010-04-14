@@ -1,11 +1,11 @@
 # The main module for the has_remote plugin. Please see README for more information.
 #
 module HasRemote
-  
+
   def self.included(base) #:nodoc:
     base.extend ClassMethods
   end
-  
+
   # Returns an array of all models that have a remote.
   #
   def self.models
@@ -14,25 +14,25 @@ module HasRemote
 
     @models ||= []
   end
-  
+
   # Updates cached attributes, destroys deleted records and adds new records of all models that have a remote.
   # Also see HasRemote::Synchronizable.
   #
   def self.synchronize!
     models.each(&:synchronize!)
   end
-      
+
   module ClassMethods
-    
+
     # Gives your local ActiveRecord model a remote proxy (ActiveResource::Base),
     # which enables you to look for certain attributes remotely.
-    # 
+    #
     # ==== Options
-    # 
+    #
     # [:foreign_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
     # [:remote_primary_key]  The name of the remote resource's primary key. Defaults to :id.
     # [:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
-    #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html      
+    #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html
     # [:through]     Optional custom ActiveResource class name to use for the proxy. If not set, a default class called
     #                "<ModelName>::Remote" will be created dynamically. *Note* that any ActiveResource
     #                configuration options will still be applied to this class.
@@ -59,7 +59,7 @@ module HasRemote
     #      remote.attribute :username
     #      remote.attribute :full_name, :local_cache => true
     #      remote.attribute :email_address, :as => :email
-    #    end 
+    #    end
     #  end
     #
     #  User.find(1).username
@@ -69,13 +69,13 @@ module HasRemote
       unless options[:through] || self.const_defined?("Remote")
         self.const_set("Remote", ActiveResource::Base.clone)
       end
-      
+
       @remote_class = options[:through] ? options.delete(:through).constantize : self::Remote
-      
+
       @remote_foreign_key = options.delete(:foreign_key) || :remote_id
-      
+
       @remote_primary_key = options.delete(:remote_primary_key) || :id
-      
+
       # create extra class methods
       class << self
         attr_reader :remote_class
@@ -83,42 +83,42 @@ module HasRemote
         attr_reader :remote_finder
         attr_reader :remote_primary_key
         attr_writer :remote_attribute_aliases
-        
+
         def remote_attributes # :nodoc:
           @remote_attributes ||= []
         end
-        
+
         def remote_attribute_aliases # :nodoc:
           @remote_attribute_aliases ||= {}
         end
-        
+
         include HasRemote::Synchronizable
       end
-      
+
       # set ARes to look for correct resource (only if not manually specified)
       unless options[:element_name] || @remote_class.element_name != "remote"
         @remote_class.element_name = self.name.underscore.split('/').last
       end
-      
+
       # setup ARes class with given options
       options.each do |option, value|
-        @remote_class.send "#{option}=", value 
+        @remote_class.send "#{option}=", value
       end
-      
+
       attr_accessor :skip_update_cache
-      
+
       block.call( Config.new(self) ) if block_given?
-            
+
       include InstanceMethods
       HasRemote.models << self
     end
-    
+
   end
-  
+
   module InstanceMethods
-    
+
     # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. Returns nil
-    # if foreign key is nil. 
+    # if foreign key is nil.
     #
     # *Arguments*
     #
@@ -131,7 +131,7 @@ module HasRemote
       end
       @remote
     end
-    
+
     # Checks whether a remote proxy exists.
     #
     def has_remote?
@@ -140,14 +140,14 @@ module HasRemote
       #
       return !remote(true).nil? rescue false
     end
-    
+
     # Synchronizes all locally cached remote attributes to this object and saves the object.
     #
     def update_cached_attributes!
       update_cached_attributes
       save!
     end
-    
+
     # Synchronizes all locally cached remote attributes to this object, but does not save the object.
     #
     # Note that when the remote does no longer exist, all remote attributes will be
@@ -155,20 +155,21 @@ module HasRemote
     #
     def update_cached_attributes
       unless self.skip_update_cache || self.class.cached_attributes.empty?
+        r = remote(true)
         self.class.cached_attributes.each do |remote_attr|
           local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
-          write_attribute(local_attr, has_remote? ? remote(true).send(remote_attr) : nil)
+          write_attribute(local_attr, r.send(remote_attr))
         end
       end
     end
-    
+
   end
-  
+
   class Config
     def initialize(base) #:nodoc:
       @base = base
     end
-    
+
     # Defines a remote attribute. Adds a getter method on instances, which delegates to the remote object.
     #
     # *Options*
@@ -178,7 +179,7 @@ module HasRemote
     # [:as]           Optionally map remote attribute to this name.
     #
     # *Example*
-    # 
+    #
     #  class User < ActiveRecord::Base
     #    has_remote :site => '...' do |remote|
     #      remote.attribute :name, :local_cache => true
@@ -188,10 +189,10 @@ module HasRemote
     #
     def attribute(attr_name, options = {})
       method_name = options[:as] || attr_name
-      
+
       @base.remote_attributes << attr_name
       @base.remote_attribute_aliases = @base.remote_attribute_aliases.merge(attr_name => method_name)
-      
+
       unless options[:local_cache]
         @base.class_eval <<-RB
 
@@ -207,9 +208,9 @@ module HasRemote
       else
         @base.cached_attributes << attr_name
       end
-      
+
     end
-    
+
     # Lets you specify custom finder logic to find the record's remote object.
     # It takes a block which is passed in the id of the remote object.
     #
@@ -228,7 +229,7 @@ module HasRemote
     def finder(&block)
       @base.instance_variable_set "@remote_finder", block
     end
-    
+
   end
-  
+
 end
