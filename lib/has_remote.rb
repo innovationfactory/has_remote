@@ -155,10 +155,10 @@ module HasRemote
     #
     def update_cached_attributes
       unless self.skip_update_cache || self.class.cached_attributes.empty?
-        r = remote(true)
+        r = has_remote? ? remote : nil
         self.class.cached_attributes.each do |remote_attr|
           local_attr = self.class.remote_attribute_aliases[remote_attr] || remote_attr
-          write_attribute(local_attr, r.send(remote_attr))
+          write_attribute(local_attr, r.try(remote_attr))
         end
       end
     end
