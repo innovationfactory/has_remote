@@ -6,6 +6,7 @@ which enables you to look for certain attributes remotely using a RESTful webser
 === Installation
 
 ==== Rails 3
+**(Work in progress, will be available from version 0.2.0, which hasn't been released yet)**
 
 Add the following to your <tt>Gemfile</tt> and run <tt>bundle install</tt>:
 
