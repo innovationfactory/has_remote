@@ -15,7 +15,7 @@
  <user>
    <id type="integer">1</id>
    <remote site="...">
-	   <id type="integer">1</id>
-	   <name>George Remote</name>
-	 </remote>
+     <id type="integer">1</id>
+     <name>George Remote</name>
+   </remote>
  </user>

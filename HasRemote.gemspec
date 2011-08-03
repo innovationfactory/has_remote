@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{HasRemote}
-  s.version = "0.1.7"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Sjoerd Andringa"]
-  s.date = %q{2010-12-28}
+  s.authors = [%q{Sjoerd Andringa}]
+  s.date = %q{2011-08-03}
   s.description = %q{Bind a remote ActiveResource object to your local ActiveRecord objects, delegate attributes and optionally cache remote attributes locally.}
   s.email = %q{sjoerd.andringa@innovationfactory.eu}
   s.extra_rdoc_files = [
@@ -17,57 +17,62 @@ Gem::Specification.new do |s|
     "TODO"
   ]
   s.files = [
+    ".rspec",
+    "Gemfile",
+    "Gemfile.lock",
     "HasRemote.gemspec",
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
     "TODO",
     "VERSION",
-    "generators/has_remote_migration/has_remote_migration_generator.rb",
-    "generators/has_remote_migration/templates/create_has_remote_synchronizations.erb",
     "init.rb",
+    "lib/generators/has_remote_migration/has_remote_migration_generator.rb",
+    "lib/generators/has_remote_migration/templates/create_has_remote_synchronizations.erb",
     "lib/has_remote.rb",
+    "lib/has_remote/railtie.rb",
     "lib/has_remote/synchronizable.rb",
     "lib/has_remote/synchronization.rb",
-    "lib/has_remote/tasks.rb",
-    "rails/init.rb",
+    "lib/tasks/has_remote.rake",
     "shoulda_macros/has_remote_macros.rb",
     "spec/caching_spec.rb",
     "spec/database.yml",
     "spec/has_remote_spec.rb",
-    "spec/has_remote_spec/book.rb",
-    "spec/has_remote_spec/cheese.rb",
-    "spec/has_remote_spec/product.rb",
-    "spec/has_remote_spec/user.rb",
     "spec/schema.rb",
     "spec/spec_helper.rb",
-    "spec/synchronization_spec.rb",
-    "tasks/rails.rake"
-  ]
-  s.homepage = %q{http://github.com/innovationfactory/has_remote}
-  s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Bind a remote ActiveResource object to your local ActiveRecord objects.}
-  s.test_files = [
-    "spec/caching_spec.rb",
-    "spec/has_remote_spec.rb",
-    "spec/has_remote_spec/book.rb",
-    "spec/has_remote_spec/cheese.rb",
-    "spec/has_remote_spec/product.rb",
-    "spec/has_remote_spec/user.rb",
-    "spec/schema.rb",
-    "spec/spec_helper.rb",
+    "spec/support/book.rb",
+    "spec/support/cheese.rb",
+    "spec/support/product.rb",
+    "spec/support/user.rb",
     "spec/synchronization_spec.rb"
   ]
+  s.homepage = %q{http://github.com/innovationfactory/has_remote}
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.6}
+  s.summary = %q{Bind a remote ActiveResource object to your local ActiveRecord objects.}
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<rails>, [">= 3.0.0"])
+      s.add_development_dependency(%q<sqlite3>, [">= 1.3.4"])
+      s.add_development_dependency(%q<jeweler>, [">= 1.6.4"])
+      s.add_development_dependency(%q<rspec>, [">= 2.6.0"])
+      s.add_development_dependency(%q<shoulda-matchers>, [">= 1.0.0.beta3"])
     else
+      s.add_dependency(%q<rails>, [">= 3.0.0"])
+      s.add_dependency(%q<sqlite3>, [">= 1.3.4"])
+      s.add_dependency(%q<jeweler>, [">= 1.6.4"])
+      s.add_dependency(%q<rspec>, [">= 2.6.0"])
+      s.add_dependency(%q<shoulda-matchers>, [">= 1.0.0.beta3"])
     end
   else
+    s.add_dependency(%q<rails>, [">= 3.0.0"])
+    s.add_dependency(%q<sqlite3>, [">= 1.3.4"])
+    s.add_dependency(%q<jeweler>, [">= 1.6.4"])
+    s.add_dependency(%q<rspec>, [">= 2.6.0"])
+    s.add_dependency(%q<shoulda-matchers>, [">= 1.0.0.beta3"])
   end
 end
 

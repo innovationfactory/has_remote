@@ -5,24 +5,28 @@ which enables you to look for certain attributes remotely using a RESTful webser
 
 === Installation
 
-As a gem; Add the following to <tt>config/environment.rb</tt>:
+==== Rails 3
 
- config.gem 'HasRemote', :lib => 'has_remote'
+Add the following to your <tt>Gemfile</tt> and run <tt>bundle install</tt>:
 
-Require the rake tasks from your application's <tt>Rakefile</tt> (only if installed as a gem):
+ gem 'HasRemote', '~> 0.2.0', :require => 'has_remote'
 
- require 'has_remote/tasks'
+And only if you require synchronization, run:
 
-As a plugin; Run:
+ rails generate has_remote_migration
+ rake db:migrate
 
- script/plugin install git://github.com/innovationfactory/has_remote.git
+==== Rails 2.3
+
+Add the following to your <tt>environment.rb</tt> file and run <tt>bundle install</tt>:
+
+ config.gem 'HasRemote', :version => '~> 0.1.7', :lib => 'has_remote'
 
 And only if you require synchronization, run:
 
  script/generate has_remote_migration
-
  rake db:migrate
- 
+
 === Links
 
 [RDoc:] http://rdoc.info/projects/innovationfactory/has_remote
@@ -137,14 +141,13 @@ passed in as a hash to <tt>updated_remotes</tt> internally.)
 
 === Testing
 
-To run the specs of the plugin, from the HasRemote directory run:
- rake spec
-
-(This requires you to have both RSpec and Shoulda installed.)
+Install Bundler and run <tt>bundle install</tt> in order to obtain RSpec and other dependencies.
+To run the specs, from the root folder run:
+ rspec spec
 
 === More information & patches
 
 Questions, requests and patches can be directed to sjoerd.andringa[AT]innovationfactory[DOT]eu.
 
 
-Copyright (c) 2009-2010 Innovation Factory.
+Copyright (c) 2009-2011 Innovation Factory.

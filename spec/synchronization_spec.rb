@@ -10,10 +10,11 @@ describe HasRemote::Synchronization do
 
   describe "named scope 'for'" do
     before do
+      HasRemote::Synchronization.delete_all
       @user_synchronization = HasRemote::Synchronization.create! :model_name => 'User', :last_record_updated_at => 1.day.ago, :last_record_id => 1
       @book_synchronization = HasRemote::Synchronization.create! :model_name => 'Book', :last_record_updated_at => 1.day.ago, :last_record_id => 2
     end
-    
+
     it "should return synchronization records scoped by model_name" do
       HasRemote::Synchronization.for('User').should == [@user_synchronization]
     end

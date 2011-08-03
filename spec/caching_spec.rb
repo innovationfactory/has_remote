@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-context "Given existing remote resources" do
+describe "Given existing remote resources" do
 
   before(:each) do
     User.delete_all
@@ -27,7 +27,7 @@ context "Given existing remote resources" do
     it "should find last synchronization" do
       times = []
       3.downto(1) do |i|
-        HasRemote::Synchronization.create(:model_name => 'HasRemoteSpec::User', :last_record_updated_at => i.days.ago, :last_record_id => i)
+        HasRemote::Synchronization.create!(:model_name => 'User', :last_record_updated_at => i.days.ago, :last_record_id => i)
       end
       User.should respond_to(:last_synchronization)
       sync = User.last_synchronization
@@ -62,16 +62,14 @@ context "Given existing remote resources" do
       describe "with updated and deleted remotes" do
 
         before(:each) do
-          @yesterday = DateTime.parse 1.day.ago.to_s
-          @last_id   = 5
-          @user_1, @user_2, @user_3 = User.create!(:remote_id => @last_id), User.create!(:remote_id => 1), User.create!(:remote_id => 2)
+          @yesterday = 1.day.ago
+          @user_1, @user_2 = User.create!(:remote_id => 1), User.create!(:remote_id => 2)
 
           resources = [
             mock(:user, :id => 1, :email => "altered@foo.bar", :updated_at => 2.days.ago, :deleted_at => nil),
             mock(:user, :id => 2, :email => "deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
             mock(:user, :id => 3, :email => "new-deleted@foo.bar", :updated_at => 2.days.ago, :deleted_at => 2.days.ago),
             mock(:user, :id => 4, :email => "new@foo.bar", :updated_at => @yesterday),
-            mock(:user, :id => @last_id, :email => "changed@foo.bar", :updated_at => @yesterday)
           ]
           User.stub!(:updated_remotes).and_return(resources)
 
@@ -79,19 +77,18 @@ context "Given existing remote resources" do
         end
 
         it "should keep track of the last synchronized record" do
-          sync = HasRemote::Synchronization.for("HasRemoteSpec::User").last
+          sync = HasRemote::Synchronization.for("User").last
 
           sync.last_record_updated_at.should == @yesterday
-          sync.last_record_id.should == @last_id
+          sync.last_record_id.should == 4
         end
 
         it "should update changed users" do
-          @user_1.reload[:email].should == "changed@foo.bar"
-          @user_2.reload[:email].should == "altered@foo.bar"
+          @user_1.reload[:email].should == "altered@foo.bar"
         end
 
         it "should destroy deleted users" do
-          User.exists?(@user_3).should be_false
+          User.exists?(@user_2).should be_false
         end
 
         it "should create added users" do

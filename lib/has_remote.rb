@@ -1,3 +1,7 @@
+require 'has_remote/synchronizable'
+require 'has_remote/synchronization'
+require 'has_remote/railtie'
+
 # The main module for the has_remote plugin. Please see README for more information.
 #
 module HasRemote
@@ -10,7 +14,9 @@ module HasRemote
   #
   def self.models
     # Make sure all models are loaded:
-    Dir[File.join(RAILS_ROOT, 'app', 'models', '*.rb')].each { |f| require_dependency f }
+    if Rails.root
+      Dir[Rails.root.join('app', 'models', '*.rb')].each { |f| require_dependency f }
+    end
 
     @models ||= []
   end
@@ -67,7 +73,7 @@ module HasRemote
     #
     def has_remote(options, &block)
       unless options[:through] || self.const_defined?("Remote")
-        self.const_set("Remote", ActiveResource::Base.clone)
+        self.const_set("Remote", Class.new(ActiveResource::Base))
       end
 
       @remote_class = options[:through] ? options.delete(:through).constantize : self::Remote
@@ -231,5 +237,4 @@ module HasRemote
     end
 
   end
-
 end
