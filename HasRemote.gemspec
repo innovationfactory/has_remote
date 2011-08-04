@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Sjoerd Andringa}]
-  s.date = %q{2011-08-03}
+  s.date = %q{2011-08-04}
   s.description = %q{Bind a remote ActiveResource object to your local ActiveRecord objects, delegate attributes and optionally cache remote attributes locally.}
   s.email = %q{sjoerd.andringa@innovationfactory.eu}
   s.extra_rdoc_files = [
@@ -26,9 +26,8 @@ Gem::Specification.new do |s|
     "Rakefile",
     "TODO",
     "VERSION",
-    "init.rb",
-    "lib/generators/has_remote_migration/has_remote_migration_generator.rb",
-    "lib/generators/has_remote_migration/templates/create_has_remote_synchronizations.erb",
+    "lib/generators/has_remote/migration_generator.rb",
+    "lib/generators/has_remote/templates/create_has_remote_synchronizations.rb",
     "lib/has_remote.rb",
     "lib/has_remote/railtie.rb",
     "lib/has_remote/synchronizable.rb",

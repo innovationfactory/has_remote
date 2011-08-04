@@ -14,7 +14,7 @@ Add the following to your <tt>Gemfile</tt> and run <tt>bundle install</tt>:
 
 And only if you require synchronization, run:
 
- rails generate has_remote_migration
+ rails generate has_remote:migration
  rake db:migrate
 
 ==== Rails 2.3

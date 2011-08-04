@@ -12,10 +12,6 @@ module HasRemote
       load 'tasks/has_remote.rake'
     end
 
-    # generators do
-    #   require 'generators/has_remote_migration_generator'
-    # end
-
     def self.load!
       ActiveRecord::Base.send :include, HasRemote
       ActiveSupport.run_load_hooks(:has_remote)
