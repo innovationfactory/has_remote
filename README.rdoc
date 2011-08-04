@@ -1,12 +1,11 @@
 = HasRemote
 
-Binds your local ActiveRecord objects to a remote ActiveResource object,
+Binds your local <tt>ActiveRecord</tt> objects to a remote <tt>ActiveResource</tt> object,
 which enables you to look for certain attributes remotely using a RESTful webservice.
 
 === Installation
 
 ==== Rails 3
-_(Work in progress, will be available from version 0.2.0, which hasn't been released yet)_
 
 Add the following to your <tt>Gemfile</tt>:
 
@@ -121,7 +120,7 @@ Synchronize all records of one specific model:
 The latter automatically requests all remote resources that have been changed (including new and deleted records) since the last successful synchronization for this particular model.
 You may need to override the <tt>updated_remotes</tt> class method in your model to match your host's REST API.
 
-See <tt>HasRemote::Synchronizable</tt> for more information.
+See {HasRemote::Synchronizable} for more information.
 
 ==== Rake hr:sync
 
@@ -133,12 +132,12 @@ certain models by using the <tt>MODELS</tt> variable:
 
  rake hr:sync MODELS=Contact,Company
 
-To specify additional parameters to send with the request that fetches updated resources use the PARAMS variable:
+To specify additional parameters to send with the request that fetches updated resources use the <tt>PARAMS</tt> variable:
 
  rake hr:sync PARAMS="since=01-01-2010&limit=25"
 
-(If you've overridden the <tt>updated_remotes</tt> class method on one of your synchronizable models, then note that these parameters are
-passed in as a hash to <tt>updated_remotes</tt> internally.)
+(If you've overridden the {HasRemote::Synchronizable#updated_remotes #updated_remotes} class method on one of your synchronizable models, then note that these parameters are
+passed in as a hash to {HasRemote::Synchronizable#updated_remotes #updated_remotes} internally.)
 
 === Testing
 

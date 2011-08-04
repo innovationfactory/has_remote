@@ -1,16 +1,14 @@
 require 'rubygems'
 require 'bundler/setup'
 
-# require 'shoulda/active_record/matchers'
-# include Shoulda::ActiveRecord::Matchers
-
 # Initialize plugin
 require "rails"
 Rails.env  = ENV["RAILS_ENV"] ||= 'test'
+require "shoulda-matchers"
 require "active_record"
 require "active_resource"
+require "has_remote"
 require "has_remote/railtie"
-require "shoulda-matchers"
 HasRemote::Railtie.load!
 
 # Create logger

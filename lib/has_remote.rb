@@ -2,11 +2,11 @@ require 'has_remote/synchronizable'
 require 'has_remote/synchronization'
 require 'has_remote/railtie'
 
-# The main module for the has_remote plugin. Please see README for more information.
+# The main module for the has_remote plugin. Please see {file:README.rdoc README} for more information.
 #
 module HasRemote
 
-  def self.included(base) #:nodoc:
+  def self.included(base)
     base.extend ClassMethods
   end
 
@@ -22,7 +22,7 @@ module HasRemote
   end
 
   # Updates cached attributes, destroys deleted records and adds new records of all models that have a remote.
-  # Also see HasRemote::Synchronizable.
+  # Also see {HasRemote::Synchronizable}.
   #
   def self.synchronize!
     models.each(&:synchronize!)
@@ -30,20 +30,10 @@ module HasRemote
 
   module ClassMethods
 
-    # Gives your local ActiveRecord model a remote proxy (ActiveResource::Base),
-    # which enables you to look for certain attributes remotely.
+    # Binds your <tt>ActiveRecord</tt> objects to a remote <tt>ActiveResource</tt> resource,
+    # and enables you to look for certain attributes remotely.
     #
-    # ==== Options
-    #
-    # [:foreign_key]  The name of the column used to store the id of the remote resource. Defaults to :remote_id.
-    # [:remote_primary_key]  The name of the remote resource's primary key. Defaults to :id.
-    # [:site, :user, :password, ...]  Basically all ActiveResource configuration settings are available,
-    #                                 see http://api.rubyonrails.org/classes/ActiveResource/Base.html
-    # [:through]     Optional custom ActiveResource class name to use for the proxy. If not set, a default class called
-    #                "<ModelName>::Remote" will be created dynamically. *Note* that any ActiveResource
-    #                configuration options will still be applied to this class.
-    #
-    # ==== Usage
+    # ==== Usage:
     #
     #  class User < ActiveRecord::Base
     #    has_remote :site => 'http://people.local'
@@ -57,7 +47,7 @@ module HasRemote
     #  User.find(1).remote.username
     #  # => "User name from remote server"
     #
-    # has_remote also takes a block which is passed in a HasRemote::Config object which can be used to specify
+    # has_remote also takes a block which is passed in a {Config} object which can be used to specify
     # remote attributes:
     #
     #  class User < ActiveRecord::Base
@@ -70,6 +60,14 @@ module HasRemote
     #
     #  User.find(1).username
     #  # => "User name from remote server"
+    #
+    # @option options [Symbol, String] :foreign_key (:remote_id) The name of the column used to store the id of the remote resource..
+    # @option options [Symbol, String] :remote_primary_key (:id) The name of the remote resource's primary key.
+    # @option options [String] :through Optional custom <tt>ActiveResource</tt> class name to use for the proxy. If not set, a default class called
+    #                          <tt>Remote</tt> will be created dynamically, namespaced inside the current model. *Note* that any <tt>ActiveResource</tt>
+    #                          configuration options will still be applied to this class.
+    # @option options Other All other options you pass in will be used to configure the <tt>ActiveResource</tt> model, you can use any setting for {http://api.rubyonrails.org/classes/ActiveResource/Base.html ActiveResource::Base}, such as <tt>:site</tt>, <tt>:user</tt> and <tt>:password</tt>.
+    # @yieldparam [Config] remote Configure attributes to be delegated or a custom finder.
     #
     def has_remote(options, &block)
       unless options[:through] || self.const_defined?("Remote")
@@ -123,12 +121,10 @@ module HasRemote
 
   module InstanceMethods
 
-    # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. Returns nil
-    # if foreign key is nil.
+    # Returns the remote proxy for this record as an <tt>ActiveResource::Base</tt> object. Returns <tt>nil</tt>
+    # if foreign key is <tt>nil</tt>.
     #
-    # *Arguments*
-    #
-    # - <tt>force_reload</tt>:  Forces a reload from the remote server if set to true. Defaults to false.
+    # @param [Boolean] force_reload Forces a reload from the remote server if set to <tt>true</tt>.
     #
     def remote(force_reload = false)
       if force_reload || @remote.nil?
@@ -140,6 +136,8 @@ module HasRemote
 
     # Checks whether a remote proxy exists.
     #
+    # @return [Boolean]
+    #
     def has_remote?
       # NOTE ARes#exists? is broken:
       # https://rails.lighthouseapp.com/projects/8994/tickets/1223-activeresource-head-request-sends-headers-with-a-nil-key
@@ -149,6 +147,8 @@ module HasRemote
 
     # Synchronizes all locally cached remote attributes to this object and saves the object.
     #
+    # @raise [ActiveRecord::RecordInvalid]
+    #
     def update_cached_attributes!
       update_cached_attributes
       save!
@@ -157,7 +157,7 @@ module HasRemote
     # Synchronizes all locally cached remote attributes to this object, but does not save the object.
     #
     # Note that when the remote does no longer exist, all remote attributes will be
-    # set to nil.
+    # set to <tt>nil</tt>.
     #
     def update_cached_attributes
       unless self.skip_update_cache || self.class.cached_attributes.empty?
@@ -171,20 +171,19 @@ module HasRemote
 
   end
 
+  # The block argument for {HasRemote::ClassMethods#has_remote} is an instance of this class.
+  # It can be used to configure HasRemote's behaviour for a model.
+  #
   class Config
+
+    # @private
     def initialize(base) #:nodoc:
       @base = base
     end
 
     # Defines a remote attribute. Adds a getter method on instances, which delegates to the remote object.
     #
-    # *Options*
-    #
-    # [:local_cache]  If set to true the attribute will also be saved locally. See README for more information
-    #                 about caching and synchronization.
-    # [:as]           Optionally map remote attribute to this name.
-    #
-    # *Example*
+    # ==== Example:
     #
     #  class User < ActiveRecord::Base
     #    has_remote :site => '...' do |remote|
@@ -192,6 +191,11 @@ module HasRemote
     #      remote.attribute :email, :as => :email_address
     #    end
     #  end
+    #
+    # @param [String, Symbol] attr_name The name of the attribute you want to delegate to the remote.
+    # @option options [Boolean] :local_cache (false) If set to <tt>true</tt> the attribute will also be saved locally. See {file:README.rdoc README} for more information
+    #                 about caching and synchronization.
+    # @option options [Symbol, String] :as Optionally map the remote attribute to this name.
     #
     def attribute(attr_name, options = {})
       method_name = options[:as] || attr_name
@@ -218,12 +222,12 @@ module HasRemote
     end
 
     # Lets you specify custom finder logic to find the record's remote object.
-    # It takes a block which is passed in the id of the remote object.
+    # It takes a block which is passed in the ID of the remote object.
     #
-    # (By default <tt>Model.remote_class.find(id)</tt> would be called.)
+    # By default the following finder is used:
+    #  MyModel.remote_class.find(id)
     #
-    # *Example*
-    #
+    # ==== Example:
     #  class User < ActiveRecord::Base
     #    has_remote :site => "..." do |remote|
     #      remote.finder do |id|

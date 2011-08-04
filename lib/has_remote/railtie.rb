@@ -1,7 +1,8 @@
 require 'rails'
 
 module HasRemote
-  class Railtie < Rails::Railtie
+  # @private
+  class Railtie < Rails::Railtie  #:nodoc:
     initializer 'has_remote.load' do
       ActiveSupport.on_load(:active_record) do
         HasRemote::Railtie.load!
