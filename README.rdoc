@@ -6,9 +6,9 @@ which enables you to look for certain attributes remotely using a RESTful webser
 === Installation
 
 ==== Rails 3
-**(Work in progress, will be available from version 0.2.0, which hasn't been released yet)**
+_(Work in progress, will be available from version 0.2.0, which hasn't been released yet)_
 
-Add the following to your <tt>Gemfile</tt> and run <tt>bundle install</tt>:
+Add the following to your <tt>Gemfile</tt>:
 
  gem 'HasRemote', '~> 0.2.0', :require => 'has_remote'
 
@@ -19,7 +19,7 @@ And only if you require synchronization, run:
 
 ==== Rails 2.3
 
-Add the following to your <tt>environment.rb</tt> file and run <tt>bundle install</tt>:
+Add the following to <tt>environment.rb</tt>:
 
  config.gem 'HasRemote', :version => '~> 0.1.7', :lib => 'has_remote'
 
